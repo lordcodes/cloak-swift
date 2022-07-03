@@ -20,10 +20,10 @@ public struct EncryptionService {
     /// Save an encryption key to the keychain.
     ///
     /// - parameter key: Encryption key
-    public func saveKey(key: String, serviceName: String) {
-        printer.printMessage("💾 Saving encryption key for \(serviceName)")
+    public func saveKey(key: String, service: String) {
+        printer.printMessage("💾 Saving encryption key for \(service)")
 
-        let keychain = KeychainAccessor(serviceName: serviceName)
+        let keychain = KeychainAccessor(service: service)
         handleNonFatalError {
             try keychain.save(key, for: KeychainAccessor.encryptionKey)
             printer.printMessage("Encryption key saved!")

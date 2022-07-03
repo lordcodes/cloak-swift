@@ -8,10 +8,10 @@ typealias KeychainQuery = [String: Any]
 class KeychainAccessor {
     static let encryptionKey = "EncryptionKey"
 
-    let serviceName: String
+    let service: String
 
-    init(serviceName: String) {
-        self.serviceName = serviceName
+    init(service: String) {
+        self.service = service
     }
 
     private let lock = NSLock()
@@ -68,7 +68,7 @@ class KeychainAccessor {
         [
             KeychainConstants.klass: kSecClassGenericPassword,
             KeychainConstants.accessible: kSecAttrAccessibleAfterFirstUnlock,
-            KeychainConstants.service: "cloak-\(serviceName)",
+            KeychainConstants.service: "cloak-\(service)",
         ]
     }
 

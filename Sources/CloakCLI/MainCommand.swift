@@ -7,7 +7,6 @@ struct MainCommand {
      let arguments: [String]
 
     // TODO
-    // createkey -> --save|-s flag to run addkey command after creating
     // encrypt -> provide raw secret, output encrypted secret
     // decrypt -> provide encrypted secret, output raw secret
     public func run() throws {

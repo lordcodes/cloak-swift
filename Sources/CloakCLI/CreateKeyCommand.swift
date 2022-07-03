@@ -7,35 +7,13 @@ struct CreateKeyCommand {
     let options: [String]
 
     func run() {
-        if options.count > 1 {
-            printMultipleOptionsError(options: options)
+        if options.contains(where: { $0 == "-h" || $0 == "--help" }) {
+            printHelp()
             return
         }
-        switch options.first {
-        case .none:
-            performCreateKey(isQuiet: false)
-        case .some("-q"), .some("--quiet"):
-            performCreateKey(isQuiet: true)
-        case .some("-h"), .some("--help"):
-            printHelp()
-        case let .some(other):
-            printUnexpectedOptionError(option: other)
-        }
-    }
-
-    private func performCreateKey(isQuiet: Bool) {
+        let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
         Cloak.configuration.printer = ConsolePrinter(quiet: isQuiet)
         EncryptionService().createKey()
-    }
-
-    private func printMultipleOptionsError(options: [String]) {
-        print("Error: Please provide single option from \(options)")
-        printHelp()
-    }
-
-    private func printUnexpectedOptionError(option: String) {
-        print("Error: Unknown option '\(option)'\n")
-        printHelp()
     }
 
     private func printHelp() {
