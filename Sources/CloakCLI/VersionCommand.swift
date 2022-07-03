@@ -4,10 +4,14 @@ import CloakKit
 
 struct VersionCommand {
     let programName: String
-    let option: String?
+    let options: [String]
 
     func run() {
-        switch option {
+        if options.count > 1 {
+            printMultipleOptionsError(options: options)
+            return
+        }
+        switch options.first {
         case .none:
             performVersion()
         case .some("-h"), .some("--help"):
@@ -20,6 +24,11 @@ struct VersionCommand {
     private func performVersion() {
         Cloak.configuration.printer = ConsolePrinter(quiet: false)
         VersionService().run()
+    }
+
+    private func printMultipleOptionsError(options: [String]) {
+        print("Error: Please provide single option from \(options)")
+        printHelp()
     }
 
     private func printUnexpectedOptionError(option: String) {

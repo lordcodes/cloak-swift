@@ -12,13 +12,22 @@ public struct EncryptionService {
     public func createKey() {
         printer.printMessage("🔑 Creating encryption key")
 
-        let key = createEncryptionKey()
+        let symmetricKey = SymmetricKey(size: .bits256).withUnsafeBytes { Data($0) }
+        let key = symmetricKey.base64String
         printer.printForced(key)
     }
 
-    private func createEncryptionKey() -> String {
-        let key = SymmetricKey(size: .bits256).withUnsafeBytes { Data($0) }
-        return key.base64String
+    /// Save an encryption key to the keychain.
+    ///
+    /// - parameter key: Encryption key
+    public func saveKey(key: String, serviceName: String) {
+        printer.printMessage("💾 Saving encryption key for \(serviceName)")
+
+        let keychain = KeychainAccessor(serviceName: serviceName)
+        handleNonFatalError {
+            try keychain.save(key, for: KeychainAccessor.encryptionKey)
+            printer.printMessage("Encryption key saved!")
+        }
     }
 }
 

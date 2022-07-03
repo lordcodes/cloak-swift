@@ -4,10 +4,14 @@ import CloakKit
 
 struct CreateKeyCommand {
     let programName: String
-    let option: String?
+    let options: [String]
 
     func run() {
-        switch option {
+        if options.count > 1 {
+            printMultipleOptionsError(options: options)
+            return
+        }
+        switch options.first {
         case .none:
             performCreateKey(isQuiet: false)
         case .some("-q"), .some("--quiet"):
@@ -24,6 +28,11 @@ struct CreateKeyCommand {
         EncryptionService().createKey()
     }
 
+    private func printMultipleOptionsError(options: [String]) {
+        print("Error: Please provide single option from \(options)")
+        printHelp()
+    }
+
     private func printUnexpectedOptionError(option: String) {
         print("Error: Unknown option '\(option)'\n")
         printHelp()
@@ -31,7 +40,7 @@ struct CreateKeyCommand {
 
     private func printHelp() {
         let help = """
-        OVERVIEW: Create encryption key
+        OVERVIEW: Create encryption key.
 
         USAGE: \(programName) createkey [--quiet]
 
