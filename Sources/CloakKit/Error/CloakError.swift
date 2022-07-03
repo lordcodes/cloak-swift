@@ -4,6 +4,12 @@ import Foundation
 
 /// Error type thrown by Cloak's throwing APIs.
 public enum CloakError: Error, Equatable {
+    /// Encryption failed.
+    case encryptionFailed
+
+    /// Encryption key not found.
+    case encryptionKeyNotFound
+
     /// Keychain operation failed.
     /// - parameter statusCode: Status code of the keychain error.
     case keychainFailure(statusCode: OSStatus)
@@ -28,6 +34,10 @@ extension CloakError: CustomStringConvertible {
 
     private var reason: String {
         switch self {
+        case .encryptionFailed:
+            return  "Encryption failed"
+        case .encryptionKeyNotFound:
+            return "Encryption key not found in keychain"
         case let .keychainFailure(statusCode):
             return "Keychain error, status code \(statusCode)"
         case let .otherError(message):

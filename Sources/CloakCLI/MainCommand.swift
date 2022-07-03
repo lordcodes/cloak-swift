@@ -15,6 +15,10 @@ struct MainCommand {
         switch subcommand {
         case "createkey":
             CreateKeyCommand(programName: programName, options: options).run()
+        case "decrypt":
+            try DecryptCommand(programName: programName, options: options).run()
+        case "encrypt":
+            try EncryptCommand(programName: programName, options: options).run()
         case "savekey":
             SaveKeyCommand(programName: programName, options: options).run()
         case "version":

@@ -12,12 +12,14 @@ func handleFatalError<ResultT>(block: () throws -> ResultT) throws -> ResultT {
     }
 }
 
-func handleNonFatalError(block: () throws -> Void) {
+func handleNonFatalError<ResultT>(block: () throws -> ResultT) -> ResultT? {
     do {
-        try block()
+        return try block()
     } catch let error as CloakError {
         printer.printError(error)
+        return nil
     } catch {
         printer.printError(.otherError(error.localizedDescription))
+        return nil
     }
 }

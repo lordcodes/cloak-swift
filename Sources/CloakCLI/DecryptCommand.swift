@@ -3,19 +3,19 @@
 import CloakKit
 import Foundation
 
-struct SaveKeyCommand {
+struct DecryptCommand {
     let programName: String
     let options: [String]
 
-    func run() {
+    func run() throws {
         if options.contains(where: { $0 == "-h" || $0 == "--help" }) {
             printHelp()
             return
         }
         let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
         Cloak.configuration.printer = ConsolePrinter(quiet: isQuiet)
-        guard let key = options.first else {
-            print("Error: Missing key\n")
+        guard let decryptValue = options.first else {
+            print("Error: Missing value to decrypt\n")
             printHelp()
             return
         }
@@ -24,7 +24,7 @@ struct SaveKeyCommand {
             printHelp()
             return
         }
-        EncryptionService().saveKey(key: key, service: service)
+        try EncryptionService().decrypt(value: decryptValue, service: service)
     }
 
     private func findService() -> String? {
