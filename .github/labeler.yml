@@ -1,0 +1,16 @@
+# Root of repo changes
+repo:
+  - ./*
+
+build:
+  - Package.swift
+  - Package.resolved
+  - Makefile
+  - .swiftpm/**/*
+
+documentation:
+  - CONTRIBUTING.md
+  - README.md
+
+tests:
+  - Tests/**/*
