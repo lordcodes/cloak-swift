@@ -1,6 +1,7 @@
 // Copyright © 2022 Andrew Lord.
 
 import Darwin
+import CloakKit
 
 let command = MainCommand(arguments: CommandLine.arguments)
 do {

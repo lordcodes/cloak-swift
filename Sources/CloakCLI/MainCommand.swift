@@ -2,13 +2,11 @@
 
 import Darwin
 import Foundation
+import CloakKit
 
 struct MainCommand {
      let arguments: [String]
 
-    // TODO
-    // encrypt -> provide raw secret, output encrypted secret
-    // decrypt -> provide encrypted secret, output raw secret
     public func run() throws {
         let programName = try extractProgramName()
         let (subcommand, options) = try extractSubcommand(programName: programName)
@@ -26,7 +24,7 @@ struct MainCommand {
         case "-h", "--help":
             printHelp(programName: programName)
         default:
-            printUnexpectedArgumentError(programName: programName, argument: subcommand)
+            try printUnexpectedArgumentError(programName: programName, argument: subcommand)
         }
     }
 
@@ -50,9 +48,10 @@ struct MainCommand {
         return (subcommand: command, options: Array(arguments.dropFirst()))
     }
 
-    private func printUnexpectedArgumentError(programName: String, argument: String) {
+    private func printUnexpectedArgumentError(programName: String, argument: String) throws {
         print("Error: Unknown argument '\(argument)'\n")
         printHelp(programName: programName)
+        throw ExitCode.failure
     }
 
     private func printHelp(programName: String) {

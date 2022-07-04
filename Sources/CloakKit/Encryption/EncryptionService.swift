@@ -35,20 +35,28 @@ public struct EncryptionService {
     ///
     /// - parameter value: Value to encrypt
     /// - parameter service: Service for finding encryption key in keychain
-    public func encrypt(value: String, service: String) throws {
-        printer.printMessage("🔠 Encrypting \(value) for \(service)")
+    /// - parameter fallbackKey: Key to fall back to if not found in keychain
+    public func encrypt(value: String, service: String?, fallbackKey: String?) throws {
+        printer.printMessage("🔠 Encrypting \(value)")
 
-        let keychain = KeychainAccessor(service: service)
-        guard let key = try? keychain.retrieve(for: KeychainAccessor.encryptionKey) else {
+        guard let key = encryptionKeyFromKeychain(service: service) ?? fallbackKey else {
             printer.printError(.encryptionKeyNotFound)
-            throw ExecutionError.failure
+            throw ExitCode.failure
         }
         printer.printMessage("Encryption key read from keychain successfully")
         guard let encrypted = try? performEncrypt(value: value, using: key)?.base64String else {
             printer.printError(.encryptionFailed)
-            throw ExecutionError.failure
+            throw ExitCode.failure
         }
         printer.printForced("\n\(encrypted)")
+    }
+
+    private func encryptionKeyFromKeychain(service: String?) -> String? {
+        guard let service = service else {
+            return nil
+        }
+        let keychain = KeychainAccessor(service: service)
+        return try? keychain.retrieve(for: KeychainAccessor.encryptionKey)
     }
 
     private func performEncrypt(value: String, using key: String) throws -> Data? {
@@ -72,18 +80,18 @@ public struct EncryptionService {
     ///
     /// - parameter value: Value to decrypt
     /// - parameter service: Service for finding encryption key in keychain
-    public func decrypt(value: String, service: String) throws {
-        printer.printMessage("🔠 Decrypting \(value) for \(service)")
+    /// - parameter fallbackKey: Key to fall back to if not found in keychain
+    public func decrypt(value: String, service: String?, fallbackKey: String?) throws {
+        printer.printMessage("🔠 Decrypting \(value)")
 
-        let keychain = KeychainAccessor(service: service)
-        guard let key = try? keychain.retrieve(for: KeychainAccessor.encryptionKey) else {
+        guard let key = encryptionKeyFromKeychain(service: service) ?? fallbackKey else {
             printer.printError(.encryptionKeyNotFound)
-            throw ExecutionError.failure
+            throw ExitCode.failure
         }
         printer.printMessage("Encryption key read from keychain successfully")
         guard let decrypted = try? performDecrypt(value: value, using: key) else {
             printer.printError(.encryptionFailed)
-            throw ExecutionError.failure
+            throw ExitCode.failure
         }
         printer.printForced("\n\(decrypted)")
     }

@@ -5,10 +5,10 @@ func handleFatalError<ResultT>(block: () throws -> ResultT) throws -> ResultT {
         return try block()
     } catch let error as CloakError {
         printer.printError(error)
-        throw ExecutionError.failure
+        throw ExitCode.failure
     } catch {
         printer.printError(.otherError(error.localizedDescription))
-        throw ExecutionError.failure
+        throw ExitCode.failure
     }
 }
 

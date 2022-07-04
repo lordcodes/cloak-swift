@@ -39,7 +39,7 @@ struct SaveKeyCommand {
     }
 
     private func findServiceEnvironment() -> String? {
-        ProcessInfo.processInfo.environment["CLOAK_ENCRYPTION_KEY"]
+        ProcessInfo.processInfo.environment["CLOAK_SERVICE"]
     }
 
     private func printHelp() {

@@ -19,12 +19,7 @@ struct DecryptCommand {
             printHelp()
             return
         }
-        guard let service = findService() else {
-            print("Error: Missing service\n")
-            printHelp()
-            return
-        }
-        try EncryptionService().decrypt(value: decryptValue, service: service)
+        try EncryptionService().decrypt(value: decryptValue, service: findService(), fallbackKey: findEncryptionKeyEnvironment())
     }
 
     private func findService() -> String? {
@@ -39,6 +34,10 @@ struct DecryptCommand {
     }
 
     private func findServiceEnvironment() -> String? {
+        ProcessInfo.processInfo.environment["CLOAK_SERVICE"]
+    }
+
+    private func findEncryptionKeyEnvironment() -> String? {
         ProcessInfo.processInfo.environment["CLOAK_ENCRYPTION_KEY"]
     }
 
