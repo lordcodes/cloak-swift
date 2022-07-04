@@ -4,7 +4,7 @@ import CloakKit
 import Foundation
 
 struct SaveKeyCommand {
-    let programName: String
+    let config: CloakConfig
     let options: [String]
 
     func run() {
@@ -28,7 +28,7 @@ struct SaveKeyCommand {
     }
 
     private func findService() -> String? {
-        findServiceOption() ?? findServiceEnvironment()
+        findServiceOption() ?? config.service
     }
 
     private func findServiceOption() -> String? {
@@ -38,18 +38,14 @@ struct SaveKeyCommand {
         return options[serviceIndex + 1]
     }
 
-    private func findServiceEnvironment() -> String? {
-        ProcessInfo.processInfo.environment["CLOAK_SERVICE"]
-    }
-
     private func printHelp() {
         let help = """
         OVERVIEW: Save encryption key to keychain for use.
 
-        USAGE: \(programName) savekey [--service SERVICE] [--quiet]
+        USAGE: \(config.programName) savekey [--service SERVICE] [--quiet]
 
         OPTIONS:
-          -s, --service           Service name for entries in Keychain.
+          -s, --service           Service name for entries in Keychain (optional, can be provided through environment or config file).
           -q, --quiet             Silence any output except errors.
           -h, --help              Show help information.
 

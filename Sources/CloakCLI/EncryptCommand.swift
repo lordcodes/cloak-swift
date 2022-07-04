@@ -4,7 +4,7 @@ import CloakKit
 import Foundation
 
 struct EncryptCommand {
-    let programName: String
+    let config: CloakConfig
     let options: [String]
 
     func run() throws {
@@ -19,11 +19,11 @@ struct EncryptCommand {
             printHelp()
             return
         }
-        try EncryptionService().encrypt(value: encryptValue, service: findService(), fallbackKey: Environment.encryptionKey)
+        try EncryptionService().encrypt(value: encryptValue, service: findService(), fallbackKey: config.encryptionKey)
     }
 
     private func findService() -> String? {
-        findServiceOption() ?? Environment.service
+        findServiceOption() ?? config.service
     }
 
     private func findServiceOption() -> String? {
@@ -37,10 +37,10 @@ struct EncryptCommand {
         let help = """
         OVERVIEW: Save encryption key to keychain for use.
 
-        USAGE: \(programName) savekey [--service SERVICE] [--quiet]
+        USAGE: \(config.programName) savekey [--service SERVICE] [--quiet]
 
         OPTIONS:
-          -s, --service           Service name for entries in Keychain.
+          -s, --service           Service name for entries in Keychain (optional, can be provided through environment or config file).
           -q, --quiet             Silence any output except errors.
           -h, --help              Show help information.
 

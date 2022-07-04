@@ -3,7 +3,7 @@
 import CloakKit
 
 struct CreateKeyCommand {
-    let programName: String
+    let config: CloakConfig
     let options: [String]
 
     func run() {
@@ -20,7 +20,7 @@ struct CreateKeyCommand {
         let help = """
         OVERVIEW: Create encryption key.
 
-        USAGE: \(programName) createkey [--quiet]
+        USAGE: \(config.programName) createkey [--quiet]
 
         OPTIONS:
           -q, --quiet             Silence any output except errors

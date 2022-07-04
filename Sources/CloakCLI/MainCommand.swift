@@ -10,17 +10,18 @@ struct MainCommand {
     public func run() throws {
         let programName = try extractProgramName()
         let (subcommand, options) = try extractSubcommand(programName: programName)
+        let config = loadConfig(programName: programName)
         switch subcommand {
         case "createkey":
-            CreateKeyCommand(programName: programName, options: options).run()
+            CreateKeyCommand(config: config, options: options).run()
         case "decrypt":
-            try DecryptCommand(programName: programName, options: options).run()
+            try DecryptCommand(config: config, options: options).run()
         case "encrypt":
-            try EncryptCommand(programName: programName, options: options).run()
+            try EncryptCommand(config: config, options: options).run()
         case "savekey":
-            SaveKeyCommand(programName: programName, options: options).run()
+            SaveKeyCommand(config: config, options: options).run()
         case "version":
-            VersionCommand(programName: programName, options: options).run()
+            VersionCommand(config: config, options: options).run()
         case "-h", "--help":
             printHelp(programName: programName)
         default:

@@ -3,14 +3,10 @@
 import CloakKit
 
 struct VersionCommand {
-    let programName: String
+    let config: CloakConfig
     let options: [String]
 
     func run() {
-        if options.count > 1 {
-            printMultipleOptionsError(options: options)
-            return
-        }
         switch options.first {
         case .none:
             performVersion()
@@ -26,29 +22,16 @@ struct VersionCommand {
         VersionService().run()
     }
 
-    private func printMultipleOptionsError(options: [String]) {
-        print("Error: Please provide single option from \(options)")
-        printHelp()
-    }
-
     private func printUnexpectedOptionError(option: String) {
-        let message = """
-        Error: Unknown option '\(option)'
-
-        USAGE: \(programName) version
-
-        OPTIONS:
-          -h, --help              Show help information.
-
-        """
-        print(message)
+        print("Error: Unknown option '\(option)'\n")
+        printHelp()
     }
 
     private func printHelp() {
         let help = """
         OVERVIEW: Print version
 
-        USAGE: \(programName) version
+        USAGE: \(config.programName) version
 
         OPTIONS:
           -h, --help              Show help information.
