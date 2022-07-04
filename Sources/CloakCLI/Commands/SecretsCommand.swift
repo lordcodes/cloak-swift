@@ -28,12 +28,12 @@ struct SecretsCommand {
         var addSecretValues = [SecretKey: String]()
         for missingSecret in missingSecrets {
             var newValue: String?
-            while newValue == nil {
-                print("Please enter value for \(missingSecret):")
-                newValue = readLine()
+            while newValue == nil || newValue?.isEmpty == true {
+                print("Please enter value for \(missingSecret.raw):")
+                newValue = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines)
             }
             guard let secretValue = newValue else {
-                print("Error: No value entered for \(missingSecret)")
+                print("Error: No value entered for \(missingSecret.raw)")
                 throw ExitCode.failure
             }
             addSecretValues[missingSecret] = secretValue
@@ -41,8 +41,26 @@ struct SecretsCommand {
         try secretService.saveSecrets(addSecretValues, service: service)
 
         let allSecrets = secretValues.merging(addSecretValues) { first, second in first }
-        // TODO: Generate secrets Swift file
-        print(allSecrets)
+        var generatedFile = "// Generated using Cloak Swift — https://github.com/lordcodes/cloak-swift\n"
+        generatedFile += "// DO NOT EDIT\n"
+        generatedFile += "\n"
+        generatedFile += "// swiftlint:disable all\n"
+        generatedFile += "// swiftformat:disable all\n"
+        generatedFile += "\n"
+        generatedFile += "enum \(config.secretsClassName) {\n"
+        for (key, value) in allSecrets {
+            generatedFile += "    static let \(key.raw.camelcased()) = \"\(value)\"\n"
+        }
+        generatedFile += "}\n"
+        let currentDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        guard let generatedPath = URL(string: config.secretsFilePath, relativeTo: currentDirectory) else {
+            return
+        }
+        do {
+            try generatedFile.write(to: generatedPath, atomically: true, encoding: .utf8)
+        } catch {
+            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
+        }
     }
 
     private func findService() -> String? {
@@ -81,5 +99,27 @@ struct SecretsCommand {
 
         """
         print(help)
+    }
+}
+
+private let badChars = CharacterSet.alphanumerics.inverted
+
+private extension String {
+    func uppercasingFirst() -> String {
+        prefix(1).uppercased() + dropFirst()
+    }
+
+    func lowercasingFirst() -> String {
+        prefix(1).lowercased() + dropFirst()
+    }
+
+    func camelcased() -> String {
+        guard !isEmpty else {
+            return ""
+        }
+        let parts = self.components(separatedBy: badChars)
+        let first = String(describing: parts.first!).lowercasingFirst()
+        let rest = parts.dropFirst().map({ String($0).uppercasingFirst() })
+        return ([first] + rest).joined(separator: "")
     }
 }

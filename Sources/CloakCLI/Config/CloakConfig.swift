@@ -6,6 +6,8 @@ struct CloakConfig {
     let programName: String
     let encryptionKey: String?
     let service: String?
+    let secretsClassName: String
+    let secretsFilePath: String
 }
 
 func loadConfig(programName: String) -> CloakConfig {
@@ -13,7 +15,9 @@ func loadConfig(programName: String) -> CloakConfig {
     return CloakConfig(
         programName: programName,
         encryptionKey: properties.readProperty(for: .encryptionKey),
-        service: properties.readProperty(for: .service)
+        service: properties.readProperty(for: .service),
+        secretsClassName: properties.readProperty(for: .secretsClassName) ?? "CloakSecrets",
+        secretsFilePath: properties.readProperty(for: .secretsFilePath) ?? "CloakSecrets.swift"
     )
 }
 

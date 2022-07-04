@@ -20,6 +20,8 @@ struct MainCommand {
             try EncryptCommand(config: config, options: options).run()
         case "savekey":
             SaveKeyCommand(config: config, options: options).run()
+        case "secrets":
+            try SecretsCommand(config: config, options: options).run()
         case "version":
             VersionCommand(config: config, options: options).run()
         case "-h", "--help":

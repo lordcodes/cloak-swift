@@ -4,6 +4,8 @@ import Foundation
 
 enum EnvironmentKey: String {
     case encryptionKey = "CLOAK_ENCRYPTION_KEY"
+    case secretsClassName = "CLOAK_SECRETS_CLASS_NAME"
+    case secretsFilePath = "CLOAK_SECRETS_FILEPATH"
     case service = "CLOAK_SERVICE"
 }
 
