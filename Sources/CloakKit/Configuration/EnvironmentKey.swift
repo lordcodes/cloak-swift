@@ -6,7 +6,7 @@ enum EnvironmentKey: String {
     case encryptionKey = "CLOAK_ENCRYPTION_KEY"
     case secretsClassName = "CLOAK_SECRETS_CLASS_NAME"
     case secretsFilePath = "CLOAK_SECRETS_FILEPATH"
-    case secretsAccessModifier = "CLOAK_SECRETS_ACCESS_MODIFIER"
+    case secretsAccessLevel = "CLOAK_SECRETS_ACCESS_LEVEL"
     case service = "CLOAK_SERVICE"
 }
 

@@ -109,7 +109,7 @@ public struct SecretsService {
         // swiftformat:disable all
 
         """
-        let access = secretsAccessModifier()
+        let access = secretsAccessLevel()
         generatedFile += "\(access)enum \(config.secretsClassName) {\n"
         for (key, value) in secrets {
             generatedFile += "    \(access)static let \(key.raw.camelcased()) = \"\(value)\"\n"
@@ -127,8 +127,8 @@ public struct SecretsService {
         }
     }
 
-    private func secretsAccessModifier() -> String {
-        guard let access = config.secretsAccessModifier else {
+    private func secretsAccessLevel() -> String {
+        guard let access = config.secretsAccessLevel else {
             return ""
         }
         return "\(access) "

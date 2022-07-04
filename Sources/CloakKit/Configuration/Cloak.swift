@@ -22,7 +22,7 @@ public class Cloak {
             service: properties.readProperty(for: .service),
             secretsClassName: properties.readProperty(for: .secretsClassName) ?? "CloakSecrets",
             secretsFilePath: properties.readProperty(for: .secretsFilePath) ?? "CloakSecrets.swift",
-            secretsAccessModifier: properties.readProperty(for: .secretsAccessModifier)
+            secretsAccessLevel: properties.readProperty(for: .secretsAccessLevel)
         )
     }
 
