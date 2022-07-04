@@ -3,7 +3,6 @@
 import CloakKit
 
 struct CreateKeyCommand {
-    let config: CloakConfig
     let options: [String]
 
     func run() {
@@ -12,15 +11,17 @@ struct CreateKeyCommand {
             return
         }
         let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
-        Cloak.configuration.printer = ConsolePrinter(quiet: isQuiet)
-        EncryptionService().createKey()
+        Cloak.configure { cloak in
+            cloak.printer = ConsolePrinter(quiet: isQuiet)
+        }
+        EncryptionService(service: nil).createKey()
     }
 
     private func printHelp() {
         let help = """
         OVERVIEW: Create encryption key.
 
-        USAGE: \(config.programName) createkey [--quiet]
+        USAGE: \(programName) createkey [--quiet]
 
         OPTIONS:
           -q, --quiet             Silence any output except errors

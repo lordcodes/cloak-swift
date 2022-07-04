@@ -8,56 +8,42 @@ struct MainCommand {
      let arguments: [String]
 
     public func run() throws {
-        let programName = try extractProgramName()
-        let (subcommand, options) = try extractSubcommand(programName: programName)
-        let config = loadConfig(programName: programName)
+        let (subcommand, options) = try extractSubcommand()
         switch subcommand {
         case "createkey":
-            CreateKeyCommand(config: config, options: options).run()
+            CreateKeyCommand(options: options).run()
         case "decrypt":
-            try DecryptCommand(config: config, options: options).run()
+            try DecryptCommand(options: options).run()
         case "encrypt":
-            try EncryptCommand(config: config, options: options).run()
+            try EncryptCommand(options: options).run()
         case "savekey":
-            SaveKeyCommand(config: config, options: options).run()
+            try SaveKeyCommand(options: options).run()
         case "secrets":
-            try SecretsCommand(config: config, options: options).run()
+            try SecretsCommand(options: options).run()
         case "version":
-            VersionCommand(config: config, options: options).run()
+            VersionCommand(options: options).run()
         case "-h", "--help":
-            printHelp(programName: programName)
+            printHelp()
         default:
-            try printUnexpectedArgumentError(programName: programName, argument: subcommand)
+            try printUnexpectedArgumentError(argument: subcommand)
         }
     }
 
-    private func extractProgramName() throws -> String {
-        guard let program = arguments.first else {
-            throw ExitCode.success
-        }
-        var programName = URL(fileURLWithPath: program).lastPathComponent
-        if programName == "tuist-cloak" {
-            programName = "tuist cloak"
-        }
-        return programName
-    }
-
-    private func extractSubcommand(programName: String) throws -> (subcommand: String, options: [String]) {
-        let arguments = Array(arguments.dropFirst())
+    private func extractSubcommand() throws -> (subcommand: String, options: [String]) {
         guard arguments.count > 0, let command = arguments.first else {
-            printHelp(programName: programName)
+            printHelp()
             throw ExitCode.failure
         }
         return (subcommand: command, options: Array(arguments.dropFirst()))
     }
 
-    private func printUnexpectedArgumentError(programName: String, argument: String) throws {
+    private func printUnexpectedArgumentError(argument: String) throws {
         print("Error: Unknown argument '\(argument)'\n")
-        printHelp(programName: programName)
+        printHelp()
         throw ExitCode.failure
     }
 
-    private func printHelp(programName: String) {
+    private func printHelp() {
         let help = """
         USAGE: \(programName) <subcommand>
 

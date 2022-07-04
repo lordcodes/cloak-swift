@@ -8,11 +8,11 @@ class HandleErrorTests: XCTestCase {
     private let printer = FakePrinter()
 
     override func setUpWithError() throws {
-        Cloak.configuration.printer = printer
+        Cloak.shared.printer = printer
     }
 
     override func tearDownWithError() throws {
-        Cloak.configuration.printer = NoPrinter()
+        Cloak.shared.printer = NoPrinter()
     }
 
     func test_handleFatalError_noError() throws {

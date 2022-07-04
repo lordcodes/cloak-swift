@@ -2,8 +2,16 @@
 
 /// Service to print the current project version.
 public struct VersionService {
+    private let printer: Printer
+
     /// Create the service.
-    public init() {}
+    public init() {
+        self.init(printer: Cloak.shared.printer)
+    }
+
+    init(printer: Printer) {
+        self.printer = printer
+    }
 
     /// Entry-point to run the service.
     public func run() {

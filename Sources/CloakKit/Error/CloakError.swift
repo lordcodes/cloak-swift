@@ -14,6 +14,13 @@ public enum CloakError: Error, Equatable {
     /// - parameter statusCode: Status code of the keychain error.
     case keychainFailure(statusCode: OSStatus)
 
+    /// No value was entered for the secret key.
+    /// - parameter key: The secret key.
+    case secretKeyNoValueEntered(key: SecretKey)
+
+    /// Service wasn't set in a config file, environment variable or passed via command line
+    case serviceMissing
+
     /// Other errors that weren't explicitly handled by the framework.
     case otherError(String)
 }
@@ -40,6 +47,10 @@ extension CloakError: CustomStringConvertible {
             return "Encryption key not found in keychain"
         case let .keychainFailure(statusCode):
             return "Keychain error, status code \(statusCode)"
+        case let .secretKeyNoValueEntered(key):
+            return "No value was entered for secret key \(key.raw)"
+        case .serviceMissing:
+            return "Service wasn't set in a config file, environment variable or passed via command line"
         case let .otherError(message):
             return "Other error, \(message)"
         }

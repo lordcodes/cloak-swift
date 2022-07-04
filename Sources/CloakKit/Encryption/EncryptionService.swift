@@ -5,8 +5,27 @@ import Foundation
 
 /// Service for creating encryption keys and encrypting secrets.
 public struct EncryptionService {
+    private let service: String?
+    private let keychain: KeychainAccessor
+    private let printer: Printer
+    private let config: CloakConfig
+
     /// Create the service.
-    public init() {}
+    public init(service: String?) {
+        self.init(
+            service: service,
+            keychain: Cloak.shared.keychain,
+            printer: Cloak.shared.printer,
+            config: Cloak.shared.config
+        )
+    }
+
+    init(service: String?, keychain: KeychainAccessor, printer: Printer, config: CloakConfig) {
+        self.service = service
+        self.keychain = keychain
+        self.printer = printer
+        self.config = config
+    }
 
     /// Create a new encryption key and print it.
     public func createKey() {
@@ -21,25 +40,32 @@ public struct EncryptionService {
     ///
     /// - parameter key: Encryption key
     /// - parameter service: Service for storing in keychain
-    public func saveKey(key: String, service: String) {
-        printer.printMessage("💾 Saving encryption key for \(service)")
+    public func saveKey(key: String) throws {
+        printer.printMessage("💾 Saving encryption key")
 
-        let keychain = KeychainAccessor(service: service)
+        let service = try findService()
         handleNonFatalError {
-            try keychain.save(key, for: KeychainAccessor.encryptionKey)
+            try keychain.save(key, for: KeychainAccessor.encryptionKey, service: service)
             printer.printMessage("Encryption key saved!")
         }
+    }
+
+    private func findService() throws -> String {
+        guard let service = config.service ?? service else {
+            printer.printError(.serviceMissing)
+            throw ExitCode.failure
+        }
+        return service
     }
 
     /// Encrypt a value using encryption key from keychain.
     ///
     /// - parameter value: Value to encrypt
     /// - parameter service: Service for finding encryption key in keychain
-    /// - parameter fallbackKey: Key to fall back to if not found in keychain
-    public func encrypt(value: String, service: String?, fallbackKey: String?) throws {
+    public func encrypt(value: String) throws {
         printer.printMessage("🔠 Encrypting \(value)")
 
-        guard let key = encryptionKeyFromKeychain(service: service) ?? fallbackKey else {
+        guard let key = try findEncryptionKey() else {
             printer.printError(.encryptionKeyNotFound)
             throw ExitCode.failure
         }
@@ -51,12 +77,16 @@ public struct EncryptionService {
         printer.printForced("\n\(encrypted)")
     }
 
-    private func encryptionKeyFromKeychain(service: String?) -> String? {
-        guard let service = service else {
-            return nil
+    private func findEncryptionKey() throws -> String? {
+        if let key = config.encryptionKey {
+            return key
         }
-        let keychain = KeychainAccessor(service: service)
-        return try? keychain.retrieve(for: KeychainAccessor.encryptionKey)
+        return try encryptionKeyFromKeychain()
+    }
+
+    private func encryptionKeyFromKeychain() throws -> String? {
+        let service = try findService()
+        return try? keychain.retrieve(for: KeychainAccessor.encryptionKey, service: service)
     }
 
     private func performEncrypt(value: String, using key: String) throws -> Data? {
@@ -80,11 +110,10 @@ public struct EncryptionService {
     ///
     /// - parameter value: Value to decrypt
     /// - parameter service: Service for finding encryption key in keychain
-    /// - parameter fallbackKey: Key to fall back to if not found in keychain
-    public func decrypt(value: String, service: String?, fallbackKey: String?) throws {
+    public func decrypt(value: String) throws {
         printer.printMessage("🔠 Decrypting \(value)")
 
-        guard let key = encryptionKeyFromKeychain(service: service) ?? fallbackKey else {
+        guard let key = try findEncryptionKey() else {
             printer.printError(.encryptionKeyNotFound)
             throw ExitCode.failure
         }

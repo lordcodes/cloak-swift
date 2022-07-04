@@ -3,7 +3,6 @@
 import CloakKit
 
 struct VersionCommand {
-    let config: CloakConfig
     let options: [String]
 
     func run() {
@@ -18,7 +17,9 @@ struct VersionCommand {
     }
 
     private func performVersion() {
-        Cloak.configuration.printer = ConsolePrinter(quiet: false)
+        Cloak.configure { cloak in
+            cloak.printer = ConsolePrinter(quiet: false)
+        }
         VersionService().run()
     }
 
@@ -31,7 +32,7 @@ struct VersionCommand {
         let help = """
         OVERVIEW: Print version
 
-        USAGE: \(config.programName) version
+        USAGE: \(programName) version
 
         OPTIONS:
           -h, --help              Show help information.

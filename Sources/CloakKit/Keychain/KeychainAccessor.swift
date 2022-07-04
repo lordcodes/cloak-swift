@@ -8,24 +8,20 @@ typealias KeychainQuery = [String: Any]
 class KeychainAccessor {
     static let encryptionKey = "EncryptionKey"
 
-    let service: String
-
-    init(service: String) {
-        self.service = service
-    }
+    init() {}
 
     private let lock = NSLock()
 
-    func save(_ value: String, for account: String) throws {
+    func save(_ value: String, for account: String, service: String) throws {
         guard let valueData = value.data(using: .utf8) else {
             throw CloakError.keychainFailure(statusCode: errSecInvalidEncoding)
         }
         lock.lock()
         defer { lock.unlock() }
 
-        deleteIfExists(account: account)
+        deleteIfExists(account: account, service: service)
 
-        var query = createQuery()
+        var query = createQuery(service: service)
         query[KeychainConstants.account] = account
         query[KeychainConstants.valueData] = valueData
         let code = SecItemAdd(query as CFDictionary, nil)
@@ -34,19 +30,19 @@ class KeychainAccessor {
         }
     }
 
-    func retrieve(for account: String) throws -> String? {
-        let data = try retriveData(for: account)
+    func retrieve(for account: String, service: String) throws -> String? {
+        let data = try retriveData(for: account, service: service)
         guard let dataString = String(data: data, encoding: .utf8) else {
             throw CloakError.keychainFailure(statusCode: errSecInvalidEncoding)
         }
         return dataString
     }
 
-    private func retriveData(for account: String) throws -> Data {
+    private func retriveData(for account: String, service: String) throws -> Data {
         lock.lock()
         defer { lock.unlock() }
 
-        var query = createQuery()
+        var query = createQuery(service: service)
         query[KeychainConstants.account] = account
         query[KeychainConstants.matchLimit] = kSecMatchLimitOne
         query[KeychainConstants.returnData] = kCFBooleanTrue
@@ -64,7 +60,7 @@ class KeychainAccessor {
         return data
     }
 
-    private func createQuery() -> KeychainQuery {
+    private func createQuery(service: String) -> KeychainQuery {
         [
             KeychainConstants.klass: kSecClassGenericPassword,
             KeychainConstants.accessible: kSecAttrAccessibleAfterFirstUnlock,
@@ -72,8 +68,8 @@ class KeychainAccessor {
         ]
     }
 
-    private func deleteIfExists(account: String) {
-        var query = createQuery()
+    private func deleteIfExists(account: String, service: String) {
+        var query = createQuery(service: service)
         query[KeychainConstants.account] = account
         SecItemDelete(query as CFDictionary)
     }
