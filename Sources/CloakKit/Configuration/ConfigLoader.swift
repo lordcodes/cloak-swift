@@ -18,6 +18,7 @@ enum ConfigLoader {
     private func configFileProperties() -> [String: String] {
         let pathUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
             .appendingPathComponent(".cloak")
+            .appendingPathComponent("config")
         guard let contents = try? String(contentsOfFile: pathUrl.path, encoding: .utf8) else {
             return [:]
         }

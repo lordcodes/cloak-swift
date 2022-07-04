@@ -44,7 +44,8 @@ public struct SecretsService {
 
     private func readSecretKeys() -> [SecretKey] {
         let pathUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-            .appendingPathComponent(".cloak-secrets")
+            .appendingPathComponent(".cloak")
+            .appendingPathComponent("secret-keys")
         guard let contents = try? String(contentsOfFile: pathUrl.path, encoding: .utf8) else {
             return []
         }
