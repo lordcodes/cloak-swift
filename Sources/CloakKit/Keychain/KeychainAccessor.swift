@@ -5,6 +5,7 @@ import Security
 
 typealias KeychainQuery = [String: Any]
 
+// TODO: Test
 class KeychainAccessor {
     static let encryptionKey = "EncryptionKey"
 

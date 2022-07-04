@@ -2,6 +2,7 @@
 
 import Foundation
 
+// TODO: Document
 public struct CloakConfig {
     public let encryptionKey: String?
     public let service: String?

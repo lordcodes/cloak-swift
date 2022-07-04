@@ -11,6 +11,7 @@ public struct EncryptionService {
     private let config: CloakConfig
 
     /// Create the service.
+    /// - parameter service: Service for finding encryption key in keychain
     public init(service: String?) {
         self.init(
             service: service,
@@ -27,6 +28,7 @@ public struct EncryptionService {
         self.config = config
     }
 
+    // TODO: Test
     /// Create a new encryption key and print it.
     public func createKey() {
         printer.printMessage("🔑 Creating encryption key")
@@ -36,10 +38,9 @@ public struct EncryptionService {
         printer.printForced("\n\(key)")
     }
 
+    // TODO: Test
     /// Save an encryption key to the keychain.
-    ///
     /// - parameter key: Encryption key
-    /// - parameter service: Service for storing in keychain
     public func saveKey(key: String) throws {
         printer.printMessage("💾 Saving encryption key")
 
@@ -58,10 +59,9 @@ public struct EncryptionService {
         return service
     }
 
+    // TODO: Test
     /// Encrypt a value using encryption key from keychain.
-    ///
     /// - parameter value: Value to encrypt
-    /// - parameter service: Service for finding encryption key in keychain
     public func encrypt(value: String) throws {
         printer.printMessage("🔠 Encrypting \(value)")
 
@@ -106,10 +106,9 @@ public struct EncryptionService {
         return data
     }
 
+    // TODO: Test
     /// Decrypt a value using encryption key from keychain.
-    ///
     /// - parameter value: Value to decrypt
-    /// - parameter service: Service for finding encryption key in keychain
     public func decrypt(value: String) throws {
         printer.printMessage("🔠 Decrypting \(value)")
 

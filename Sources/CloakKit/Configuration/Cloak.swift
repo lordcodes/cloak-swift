@@ -15,6 +15,7 @@ public class Cloak {
     // TODO: Document
     public lazy var config: CloakConfig = loadConfig()
 
+    // TODO: Test loading from config file, loading from environment, fallbacks and order these are taken
     private func loadConfig() -> CloakConfig {
         let properties = configFileProperties()
         return CloakConfig(

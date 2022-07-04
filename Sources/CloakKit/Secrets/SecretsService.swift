@@ -3,8 +3,10 @@
 import Foundation
 import Security
 
+// TODO: Document
 public typealias SecretReader = () -> String?
 
+// TODO: Document
 public struct SecretsService {
     private let service: String?
     private let readSecret: SecretReader
@@ -12,6 +14,7 @@ public struct SecretsService {
     private let printer: Printer
     private let config: CloakConfig
 
+    // TODO: Document
     public init(service: String?, readSecret: @escaping SecretReader) {
         self.init(
             service: service,
@@ -30,6 +33,8 @@ public struct SecretsService {
         self.config = config
     }
 
+    // TODO: Test
+    // TODO: Document
     public func run() throws {
         let secretKeys = readSecretKeys()
         let secretValues = try findSecrets(with: secretKeys)
