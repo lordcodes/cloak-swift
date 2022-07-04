@@ -34,27 +34,7 @@ public struct SecretsService {
         let secretKeys = readSecretKeys()
         let secretValues = try findSecrets(with: secretKeys)
         let allSecrets = try fillMissingSecrets(secretKeys: secretKeys, secretValues: secretValues)
-
-        var generatedFile = "// Generated using Cloak Swift — https://github.com/lordcodes/cloak-swift\n"
-        generatedFile += "// DO NOT EDIT\n"
-        generatedFile += "\n"
-        generatedFile += "// swiftlint:disable all\n"
-        generatedFile += "// swiftformat:disable all\n"
-        generatedFile += "\n"
-        generatedFile += "enum \(config.secretsClassName) {\n"
-        for (key, value) in allSecrets {
-            generatedFile += "    static let \(key.raw.camelcased()) = \"\(value)\"\n"
-        }
-        generatedFile += "}\n"
-        let currentDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        guard let generatedPath = URL(string: config.secretsFilePath, relativeTo: currentDirectory) else {
-            return
-        }
-        do {
-            try generatedFile.write(to: generatedPath, atomically: true, encoding: .utf8)
-        } catch {
-            // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-        }
+        try generateSecretsFile(with: allSecrets)
     }
 
     private func readSecretKeys() -> [SecretKey] {
@@ -119,26 +99,52 @@ public struct SecretsService {
             }
         }
     }
+
+    private func generateSecretsFile(with secrets: [SecretKey: String]) throws {
+        var generatedFile = """
+        // Generated using Cloak Swift — https://github.com/lordcodes/cloak-swift
+        // DO NOT EDIT
+
+        // swiftlint:disable all
+        // swiftformat:disable all
+
+        """
+        let access = secretsAccessModifier()
+        generatedFile += "\(access)enum \(config.secretsClassName) {\n"
+        for (key, value) in secrets {
+            generatedFile += "    \(access)static let \(key.raw.camelcased()) = \"\(value)\"\n"
+        }
+        generatedFile += "}\n"
+        let currentDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        guard let generatedPath = URL(string: config.secretsFilePath, relativeTo: currentDirectory) else {
+            return
+        }
+        do {
+            try generatedFile.write(to: generatedPath, atomically: true, encoding: .utf8)
+        } catch {
+            printer.printError(.writeSecretsToGeneratedFileFailed)
+            throw ExitCode.failure
+        }
+    }
+
+    private func secretsAccessModifier() -> String {
+        guard let access = config.secretsAccessModifier else {
+            return ""
+        }
+        return "\(access) "
+    }
 }
 
-private let badChars = CharacterSet.alphanumerics.inverted
-
 private extension String {
-    func uppercasingFirst() -> String {
-        prefix(1).uppercased() + dropFirst()
-    }
-
-    func lowercasingFirst() -> String {
-        prefix(1).lowercased() + dropFirst()
-    }
-
     func camelcased() -> String {
         guard !isEmpty else {
             return ""
         }
-        let parts = self.components(separatedBy: badChars)
-        let first = String(describing: parts.first!).lowercasingFirst()
-        let rest = parts.dropFirst().map({ String($0).uppercasingFirst() })
-        return ([first] + rest).joined(separator: "")
+        return self
+            .split(separator: "_")
+            .map { String($0) }
+            .enumerated()
+            .map { $0.offset > 0 ? $0.element.capitalized : $0.element.lowercased() }
+            .joined()
     }
 }

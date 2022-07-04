@@ -18,8 +18,11 @@ public enum CloakError: Error, Equatable {
     /// - parameter key: The secret key.
     case secretKeyNoValueEntered(key: SecretKey)
 
-    /// Service wasn't set in a config file, environment variable or passed via command line
+    /// Service wasn't set in a config file, environment variable or passed via command line.
     case serviceMissing
+
+    /// Failed to write secrets to generated file.
+    case writeSecretsToGeneratedFileFailed
 
     /// Other errors that weren't explicitly handled by the framework.
     case otherError(String)
@@ -51,6 +54,8 @@ extension CloakError: CustomStringConvertible {
             return "No value was entered for secret key \(key.raw)"
         case .serviceMissing:
             return "Service wasn't set in a config file, environment variable or passed via command line"
+        case .writeSecretsToGeneratedFileFailed:
+            return "Failed to write secrets to generated file"
         case let .otherError(message):
             return "Other error, \(message)"
         }

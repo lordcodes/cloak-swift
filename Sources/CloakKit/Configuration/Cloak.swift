@@ -21,7 +21,8 @@ public class Cloak {
             encryptionKey: properties.readProperty(for: .encryptionKey),
             service: properties.readProperty(for: .service),
             secretsClassName: properties.readProperty(for: .secretsClassName) ?? "CloakSecrets",
-            secretsFilePath: properties.readProperty(for: .secretsFilePath) ?? "CloakSecrets.swift"
+            secretsFilePath: properties.readProperty(for: .secretsFilePath) ?? "CloakSecrets.swift",
+            secretsAccessModifier: properties.readProperty(for: .secretsAccessModifier)
         )
     }
 

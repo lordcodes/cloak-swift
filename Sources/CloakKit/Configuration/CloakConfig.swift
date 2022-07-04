@@ -7,4 +7,5 @@ public struct CloakConfig {
     public let service: String?
     public let secretsClassName: String
     public let secretsFilePath: String
+    public let secretsAccessModifier: String?
 }
