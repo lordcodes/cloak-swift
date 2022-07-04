@@ -19,11 +19,11 @@ struct EncryptCommand {
             printHelp()
             return
         }
-        try EncryptionService().encrypt(value: encryptValue, service: findService(), fallbackKey: findEncryptionKeyEnvironment())
+        try EncryptionService().encrypt(value: encryptValue, service: findService(), fallbackKey: Environment.encryptionKey)
     }
 
     private func findService() -> String? {
-        findServiceOption() ?? findServiceEnvironment()
+        findServiceOption() ?? Environment.service
     }
 
     private func findServiceOption() -> String? {
@@ -31,14 +31,6 @@ struct EncryptCommand {
             return nil
         }
         return options[serviceIndex + 1]
-    }
-
-    private func findServiceEnvironment() -> String? {
-        ProcessInfo.processInfo.environment["CLOAK_SERVICE"]
-    }
-
-    private func findEncryptionKeyEnvironment() -> String? {
-        ProcessInfo.processInfo.environment["CLOAK_ENCRYPTION_KEY"]
     }
 
     private func printHelp() {
