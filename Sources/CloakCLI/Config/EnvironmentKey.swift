@@ -10,3 +10,7 @@ enum EnvironmentKey: String {
 func environment(for key: EnvironmentKey) -> String? {
     ProcessInfo.processInfo.environment[key.rawValue]
 }
+
+func environment(for rawKey: String) -> String? {
+    ProcessInfo.processInfo.environment[rawKey]
+}

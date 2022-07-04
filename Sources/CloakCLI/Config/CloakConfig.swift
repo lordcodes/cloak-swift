@@ -41,4 +41,8 @@ private extension Dictionary where Key == String, Value == String {
     func readProperty(for key: EnvironmentKey) -> String? {
         self[key.rawValue] ?? environment(for: key)
     }
+
+    func readProperty(for rawKey: String) -> String? {
+        self[rawKey] ?? environment(for: rawKey)
+    }
 }
