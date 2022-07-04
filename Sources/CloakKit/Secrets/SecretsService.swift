@@ -74,7 +74,8 @@ public struct SecretsService {
         for key in keys {
             values[key] = environment(for: key.raw)
             if values[key] == nil {
-                values[key] = try? keychain.retrieve(for: key.raw, service: try findService())
+                let service = try findService()
+                values[key] = try? keychain.retrieve(for: key.raw, service: service)
             }
         }
         return values
@@ -82,7 +83,8 @@ public struct SecretsService {
 
     private func findService() throws -> String {
         guard let service = config.service ?? service else {
-            throw CloakError.serviceMissing
+            printer.printError(.serviceMissing)
+            throw ExitCode.failure
         }
         return service
     }
@@ -110,9 +112,10 @@ public struct SecretsService {
     }
 
     private func saveSecrets(_ secrets: [SecretKey: String]) throws {
+        let service = try findService()
         for (key, value) in secrets {
             try handleFatalError {
-                try keychain.save(value, for: key.raw, service: try findService())
+                try keychain.save(value, for: key.raw, service: service)
             }
         }
     }
