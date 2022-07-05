@@ -11,15 +11,15 @@ struct SecretsCommand {
             printHelp()
             return
         }
-        if programName.contains("tuist") {
-            print("Unavailable via the Tuist plugin")
-            return
-        }
         let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
         Cloak.configure { cloak in
             cloak.printer = ConsolePrinter(quiet: isQuiet)
         }
-        try SecretsService(service: findService(), readSecret: { readLine() }).run()
+        try SecretsService(
+            interactiveMode: !programName.contains("tuist"),
+            service: findService(),
+            readSecret: { readLine() }
+        ).run()
     }
 
     private func findService() -> String? {
@@ -32,8 +32,7 @@ struct SecretsCommand {
     private func printHelp() {
         let help = """
         OVERVIEW: Generate secrets Swift file for use in-app, missing secrets are requested and added to the keychain.
-
-        NOTE: Unavailable via the Tuist plugin.
+        When ran from Tuist, interactive mode is disabled so it will print out missing secrets that need to be provided instead.
 
         USAGE: \(programName) secrets [--service SERVICE] [--quiet]
 
@@ -44,27 +43,5 @@ struct SecretsCommand {
 
         """
         print(help)
-    }
-}
-
-private let badChars = CharacterSet.alphanumerics.inverted
-
-private extension String {
-    func uppercasingFirst() -> String {
-        prefix(1).uppercased() + dropFirst()
-    }
-
-    func lowercasingFirst() -> String {
-        prefix(1).lowercased() + dropFirst()
-    }
-
-    func camelcased() -> String {
-        guard !isEmpty else {
-            return ""
-        }
-        let parts = self.components(separatedBy: badChars)
-        let first = String(describing: parts.first!).lowercasingFirst()
-        let rest = parts.dropFirst().map({ String($0).uppercasingFirst() })
-        return ([first] + rest).joined(separator: "")
     }
 }

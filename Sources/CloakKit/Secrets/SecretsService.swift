@@ -8,6 +8,7 @@ public typealias SecretReader = () -> String?
 
 // TODO: Document
 public struct SecretsService {
+    private let interactiveMode: Bool
     private let service: String?
     private let readSecret: SecretReader
     private let keychain: KeychainAccessor
@@ -15,8 +16,9 @@ public struct SecretsService {
     private let config: CloakConfig
 
     // TODO: Document
-    public init(service: String?, readSecret: @escaping SecretReader) {
+    public init(interactiveMode: Bool, service: String?, readSecret: @escaping SecretReader) {
         self.init(
+            interactiveMode: interactiveMode,
             service: service,
             readSecret: readSecret,
             keychain: Cloak.shared.keychain,
@@ -25,7 +27,15 @@ public struct SecretsService {
         )
     }
 
-    init(service: String?, readSecret: @escaping SecretReader, keychain: KeychainAccessor, printer: Printer, config: CloakConfig) {
+    init(
+        interactiveMode: Bool,
+        service: String?,
+        readSecret: @escaping SecretReader,
+        keychain: KeychainAccessor,
+        printer: Printer,
+        config: CloakConfig
+    ) {
+        self.interactiveMode = interactiveMode
         self.service = service
         self.readSecret = readSecret
         self.keychain = keychain
@@ -38,8 +48,16 @@ public struct SecretsService {
     public func run() throws {
         let secretKeys = readSecretKeys()
         let secretValues = try findSecrets(with: secretKeys)
-        let allSecrets = try fillMissingSecrets(secretKeys: secretKeys, secretValues: secretValues)
-        try generateSecretsFile(with: allSecrets)
+        let missingSecretKeys = secretKeys.filter { secretValues[$0] == nil }
+        if interactiveMode, !missingSecretKeys.isEmpty {
+            let missingSecretValues = try requestSecrets(keys: missingSecretKeys)
+            let allSecrets = secretValues.merging(missingSecretValues) { first, second in first }
+            try generateSecretsFile(with: allSecrets)
+        } else if !missingSecretKeys.isEmpty {
+            printer.printError(.missingSecrets(secrets: missingSecretKeys))
+        } else {
+            try generateSecretsFile(with: secretValues)
+        }
     }
 
     private func readSecretKeys() -> [SecretKey] {
@@ -75,26 +93,22 @@ public struct SecretsService {
         return service
     }
 
-    private func fillMissingSecrets(
-        secretKeys: [SecretKey],
-        secretValues: [SecretKey: String]
-    ) throws -> [SecretKey: String] {
-        let missingSecrets = secretKeys.filter { secretValues[$0] == nil }
-        var addSecretValues = [SecretKey: String]()
-        for missingSecret in missingSecrets {
+    private func requestSecrets(keys: [SecretKey]) throws -> [SecretKey: String] {
+        var newValues = [SecretKey: String]()
+        for secret in keys {
             var newValue: String?
             while newValue == nil || newValue?.isEmpty == true {
-                printer.printForced("Please enter value for \(missingSecret.raw):")
+                printer.printForced("Please enter value for \(secret.raw):")
                 newValue = readSecret()?.trimmingCharacters(in: .whitespacesAndNewlines)
             }
             guard let secretValue = newValue else {
-                printer.printError(.secretKeyNoValueEntered(key: missingSecret))
+                printer.printError(.secretKeyNoValueEntered(key: secret))
                 throw ExitCode.failure
             }
-            addSecretValues[missingSecret] = secretValue
+            newValues[secret] = secretValue
         }
-        try saveSecrets(addSecretValues)
-        return secretValues.merging(addSecretValues) { first, second in first }
+        try saveSecrets(newValues)
+        return newValues
     }
 
     private func saveSecrets(_ secrets: [SecretKey: String]) throws {
