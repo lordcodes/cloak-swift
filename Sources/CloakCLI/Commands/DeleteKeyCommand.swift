@@ -3,7 +3,7 @@
 import CloakKit
 import Foundation
 
-struct SaveSecretCommand {
+struct DeleteSecretCommand {
     let options: [String]
 
     func run() throws {
@@ -20,7 +20,7 @@ struct SaveSecretCommand {
             service: findService(),
             readSecret: { readLine() }
         )
-        try secretsService.saveSecret(key: SecretKey(raw: try parseKey()), value: try parseValue())
+        try secretsService.deleteSecret(key: SecretKey(raw: try parseKey()))
     }
 
     private func parseKey() throws -> String {
@@ -30,15 +30,6 @@ struct SaveSecretCommand {
             throw ExitCode.failure
         }
         return key
-    }
-
-    private func parseValue() throws -> String {
-        guard options.count >= 2 else {
-            print("Error: Missing secret value, provide as second argument\n")
-            printHelp()
-            throw ExitCode.failure
-        }
-        return options[1]
     }
 
     private func findService() -> String? {

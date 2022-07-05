@@ -14,6 +14,8 @@ struct MainCommand {
             CreateKeyCommand(options: options).run()
         case "decrypt":
             try DecryptCommand(options: options).run()
+        case "delete":
+            try DeleteSecretCommand(options: options).run()
         case "encrypt":
             try EncryptCommand(options: options).run()
         case "savekey":

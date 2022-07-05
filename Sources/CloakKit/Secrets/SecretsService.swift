@@ -46,9 +46,19 @@ public struct SecretsService {
     // TODO: Test
     // TODO: Document
     public func saveSecret(key: SecretKey, value: String) throws {
-        printer.printMessage("💾 Saving secret \(key.raw) to keychain")
+        printer.printMessage("💾 Saving secret \(key.raw) to the keychain")
         try saveSecrets([key: value])
         printer.printMessage("Secret saved successfully")
+    }
+
+    // TODO: Test
+    // TODO: Document
+    public func deleteSecret(key: SecretKey) throws {
+        printer.printMessage("🗑 Deleting secret \(key.raw) from the keychain")
+        let service = try findService()
+        try handleFatalError {
+            try keychain.delete(account: key.raw, service: service)
+        }
     }
 
     // TODO: Test

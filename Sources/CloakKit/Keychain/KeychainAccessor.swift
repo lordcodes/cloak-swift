@@ -69,9 +69,20 @@ class KeychainAccessor {
         ]
     }
 
-    private func deleteIfExists(account: String, service: String) {
+    func delete(account: String, service: String) throws {
+        lock.lock()
+        defer { lock.unlock() }
+
+        let code = deleteIfExists(account: account, service: service)
+        if code != noErr {
+            throw CloakError.keychainFailure(statusCode: code)
+        }
+    }
+
+    @discardableResult
+    private func deleteIfExists(account: String, service: String) -> OSStatus {
         var query = createQuery(service: service)
         query[KeychainConstants.account] = account
-        SecItemDelete(query as CFDictionary)
+        return SecItemDelete(query as CFDictionary)
     }
 }
