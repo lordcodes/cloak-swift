@@ -11,6 +11,10 @@ struct SecretsCommand {
             printHelp()
             return
         }
+        if programName.contains("tuist") {
+            print("Unavailable via the Tuist plugin")
+            return
+        }
         let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
         Cloak.configure { cloak in
             cloak.printer = ConsolePrinter(quiet: isQuiet)
@@ -28,6 +32,8 @@ struct SecretsCommand {
     private func printHelp() {
         let help = """
         OVERVIEW: Generate secrets Swift file for use in-app, missing secrets are requested and added to the keychain.
+
+        NOTE: Unavailable via the Tuist plugin.
 
         USAGE: \(programName) secrets [--service SERVICE] [--quiet]
 
