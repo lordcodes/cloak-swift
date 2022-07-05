@@ -1,6 +1,6 @@
 // Copyright © 2022 Andrew Lord.
 
-// TODO: Document
+/// Type-safe wrapper for secret keys to avoid confusing the key name and value whe using Cloak APIs.
 public struct SecretKey: Hashable {
     public let raw: String
 

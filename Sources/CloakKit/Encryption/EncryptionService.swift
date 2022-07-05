@@ -41,6 +41,7 @@ public struct EncryptionService {
     // TODO: Test
     /// Save an encryption key to the keychain.
     /// - parameter key: Encryption key
+    /// - throws: ExitCode when operation failed.
     public func saveKey(key: String) throws {
         printer.printMessage("💾 Saving encryption key")
 
@@ -62,6 +63,7 @@ public struct EncryptionService {
     // TODO: Test
     /// Encrypt a value using encryption key from keychain.
     /// - parameter value: Value to encrypt
+    /// - throws: ExitCode when operation failed.
     public func encrypt(value: String) throws {
         printer.printMessage("🔠 Encrypting \(value)")
 
@@ -109,6 +111,7 @@ public struct EncryptionService {
     // TODO: Test
     /// Decrypt a value using encryption key from keychain.
     /// - parameter value: Value to decrypt
+    /// - throws: ExitCode when operation failed. 
     public func decrypt(value: String) throws {
         printer.printMessage("🔠 Decrypting \(value)")
 

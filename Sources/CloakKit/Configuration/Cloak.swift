@@ -2,7 +2,7 @@
 
 /// Configuration of the CloakKit framework.
 public class Cloak {
-    // TODO: Document
+    /// Shared Cloak instance.
     public static let shared = Cloak()
 
     /// Control outputting of messages and errors, by default does nothing.
@@ -10,10 +10,10 @@ public class Cloak {
     /// There is a `ConsolePrinter` to print to console for CLI tools.
     public var printer: Printer = NoPrinter()
 
-    // TODO: Document
+    /// Config loaded from .cloak/config file or environment variables.
     public lazy var config: CloakConfig = ConfigLoader.load()
 
-    // TODO: Document
+    /// Configure the shared instance, useful from consumers of CloakKit to set things such as the `Printer`.
     public static func configure(block: (Cloak) -> Void) {
         block(shared)
     }

@@ -2,7 +2,7 @@
 
 import Foundation
 
-// TODO: Document
+/// Config loaded from .cloak/config file or environment variables.
 public struct CloakConfig {
     public let encryptionKey: String?
     public let service: String?

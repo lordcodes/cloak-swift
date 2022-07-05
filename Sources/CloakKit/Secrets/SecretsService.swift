@@ -3,10 +3,10 @@
 import Foundation
 import Security
 
-// TODO: Document
+/// Closure to read secret value, such as from standard input in a CLI tool.
 public typealias SecretReader = () -> String?
 
-// TODO: Document
+/// Service for interacting with secrets such as saving to keychain and generating secrets file.
 public struct SecretsService {
     private let interactiveMode: Bool
     private let service: String?
@@ -15,7 +15,10 @@ public struct SecretsService {
     private let printer: Printer
     private let config: CloakConfig
 
-    // TODO: Document
+    /// Create the service.
+    /// - parameter interactiveMode: Whether secret value can be captured interactively via `readSecret`.
+    /// - parameter service: Service for finding encryption key in keychain.
+    /// - parameter readSecret: Closure to capture the value for a secret.
     public init(interactiveMode: Bool, service: String?, readSecret: @escaping SecretReader) {
         self.init(
             interactiveMode: interactiveMode,
@@ -44,7 +47,10 @@ public struct SecretsService {
     }
 
     // TODO: Test
-    // TODO: Document
+    /// Save a secret to the keychain.
+    /// - parameter key: Secret key name.
+    /// - parameter value: Secret key value.
+    /// - throws: ExitCode when operation failed. 
     public func saveSecret(key: SecretKey, value: String) throws {
         printer.printMessage("💾 Saving secret \(key.raw) to the keychain")
         try saveSecrets([key: value])
@@ -52,7 +58,9 @@ public struct SecretsService {
     }
 
     // TODO: Test
-    // TODO: Document
+    /// Delete a secret from the keychain.
+    /// - parameter key: Secret key name.
+    /// - throws: ExitCode when operation failed.
     public func deleteSecret(key: SecretKey) throws {
         printer.printMessage("🗑 Deleting secret \(key.raw) from the keychain")
         let service = try findService()
@@ -62,7 +70,8 @@ public struct SecretsService {
     }
 
     // TODO: Test
-    // TODO: Document
+    /// Generate a Swift file to access secrets from the target application.
+    /// - throws: ExitCode when operation failed.
     public func generateSecretsFile() throws {
         printer.printMessage("🤖 Generating secrets file")
         let secretKeys = readSecretKeys()
