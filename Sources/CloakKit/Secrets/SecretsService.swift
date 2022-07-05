@@ -58,6 +58,36 @@ public struct SecretsService {
     }
 
     // TODO: Test
+    /// Save secrets that are listed in bulk within a file.
+    /// - parameter file: File containing a list of secrets and their values.
+    /// - throws: ExitCode when operation failed.
+    public func saveBulkSecrets(filepath: String) throws {
+        printer.printMessage("💾 Saving secrets from a file to the keychain")
+        let secrets = readSecretsFromBulkFile(from: filepath)
+        try saveSecrets(secrets)
+        printer.printMessage("Secrets saved successfully")
+    }
+
+    private func readSecretsFromBulkFile(from filepath: String) -> [SecretKey: String] {
+        printer.printMessage("Reading secrets and values from \(filepath)")
+        guard let contents = try? String(contentsOfFile: filepath, encoding: .utf8) else {
+            return [:]
+        }
+        let lines = contents.components(separatedBy: .newlines)
+        var secrets = [SecretKey: String]()
+        for line in lines {
+            let parts = line.split(separator: "=")
+            if parts.count != 2 {
+                continue
+            }
+            let key = parts[0].trimmingCharacters(in: .whitespacesAndNewlines)
+            let value = parts[1].trimmingCharacters(in: .whitespacesAndNewlines)
+            secrets[SecretKey(raw: key)] = value
+        }
+        return secrets
+    }
+
+    // TODO: Test
     /// Delete a secret from the keychain.
     /// - parameter key: Secret key name.
     /// - throws: ExitCode when operation failed.
