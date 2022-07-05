@@ -15,7 +15,7 @@ enum ConfigLoader {
         )
     }
 
-    private func configFileProperties() -> [String: String] {
+    private static func configFileProperties() -> [String: String] {
         let pathUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
             .appendingPathComponent(".cloak")
             .appendingPathComponent("config")
