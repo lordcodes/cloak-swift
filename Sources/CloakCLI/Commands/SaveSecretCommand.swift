@@ -3,7 +3,7 @@
 import CloakKit
 import Foundation
 
-struct SecretsCommand {
+struct SaveSecretCommand {
     let options: [String]
 
     func run() throws {
@@ -20,7 +20,25 @@ struct SecretsCommand {
             service: findService(),
             readSecret: { readLine() }
         )
-        try secretsService.generateSecretsFile()
+        try secretsService.saveSecret(key: SecretKey(raw: try parseKey()), value: try parseValue())
+    }
+
+    private func parseKey() throws -> String {
+        guard options.count >= 1, let key = options.first else {
+            print("Error: Missing secret key, provide as first argument\n")
+            printHelp()
+            throw ExitCode.failure
+        }
+        return key
+    }
+
+    private func parseValue() throws -> String {
+        guard options.count >= 2 else {
+            print("Error: Missing secret value, provide as second argument\n")
+            printHelp()
+            throw ExitCode.failure
+        }
+        return options[1]
     }
 
     private func findService() -> String? {
@@ -30,12 +48,16 @@ struct SecretsCommand {
         return options[serviceIndex + 1]
     }
 
+    private func printMissingOptions() {
+        print("Error: Missing secret key or value options.")
+        printHelp()
+    }
+
     private func printHelp() {
         let help = """
-        OVERVIEW: Generate secrets Swift file for use in-app, missing secrets are requested and added to the keychain.
-        When ran from Tuist, interactive mode is disabled so it will print out missing secrets that need to be provided instead.
+        OVERVIEW: Save a secret to the keychain.
 
-        USAGE: \(programName) secrets [--service SERVICE] [--quiet]
+        USAGE: \(programName) secret [KEY] [VALUE] [--service SERVICE] [--quiet]
 
         OPTIONS:
           -s, --service           Service name for entries in Keychain (optional, can be provided through environment or config file).

@@ -18,6 +18,8 @@ struct MainCommand {
             try EncryptCommand(options: options).run()
         case "savekey":
             try SaveKeyCommand(options: options).run()
+        case "secret":
+            try SaveSecretCommand(options: options).run()
         case "secrets":
             try SecretsCommand(options: options).run()
         case "version":

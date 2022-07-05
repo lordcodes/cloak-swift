@@ -45,17 +45,31 @@ public struct SecretsService {
 
     // TODO: Test
     // TODO: Document
-    public func run() throws {
+    public func saveSecret(key: SecretKey, value: String) throws {
+        printer.printMessage("💾 Saving secret \(key.raw) to keychain")
+        try saveSecrets([key: value])
+        printer.printMessage("Secret saved successfully")
+    }
+
+    // TODO: Test
+    // TODO: Document
+    public func generateSecretsFile() throws {
+        printer.printMessage("🤖 Generating secrets file")
         let secretKeys = readSecretKeys()
+        printer.printMessage("Secret keys read from .cloak/secret-keys")
         let secretValues = try findSecrets(with: secretKeys)
+        printer.printMessage("Secrets retrieved from keychain")
         let missingSecretKeys = secretKeys.filter { secretValues[$0] == nil }
         if interactiveMode, !missingSecretKeys.isEmpty {
+            printer.printMessage("Interactive mode, requesting missing secrets and then generating secrets file")
             let missingSecretValues = try requestSecrets(keys: missingSecretKeys)
             let allSecrets = secretValues.merging(missingSecretValues) { first, second in first }
             try generateSecretsFile(with: allSecrets)
         } else if !missingSecretKeys.isEmpty {
+            printer.printMessage("Non-interactive mode, printing out missing secrets")
             printer.printError(.missingSecrets(secrets: missingSecretKeys))
         } else {
+            printer.printMessage("All secrets found, generating secrets file")
             try generateSecretsFile(with: secretValues)
         }
     }
@@ -141,6 +155,7 @@ public struct SecretsService {
         }
         do {
             try generatedFile.write(to: generatedPath, atomically: true, encoding: .utf8)
+            printer.printMessage("Generated secrets file successfully")
         } catch {
             printer.printError(.writeSecretsToGeneratedFileFailed)
             throw ExitCode.failure
