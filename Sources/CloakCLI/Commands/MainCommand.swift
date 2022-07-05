@@ -18,12 +18,12 @@ struct MainCommand {
             try DeleteSecretCommand(options: options).run()
         case "encrypt":
             try EncryptCommand(options: options).run()
+        case "generate":
+            try GenerateCommand(options: options).run()
         case "savekey":
             try SaveKeyCommand(options: options).run()
         case "secret":
             try SaveSecretCommand(options: options).run()
-        case "secrets":
-            try SecretsCommand(options: options).run()
         case "version":
             VersionCommand(options: options).run()
         case "-h", "--help":

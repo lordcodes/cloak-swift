@@ -3,7 +3,7 @@
 import CloakKit
 import Foundation
 
-struct SecretsCommand {
+struct GenerateCommand {
     let options: [String]
 
     func run() throws {
@@ -35,7 +35,7 @@ struct SecretsCommand {
         OVERVIEW: Generate secrets Swift file for use in-app, missing secrets are requested and added to the keychain.
         When ran from Tuist, interactive mode is disabled so it will print out missing secrets that need to be provided instead.
 
-        USAGE: \(programName) secrets [--service SERVICE] [--quiet]
+        USAGE: \(programName) generate [--service SERVICE] [--quiet]
 
         OPTIONS:
           -s, --service           Service name for entries in Keychain (optional, can be provided through environment or config file).
