@@ -24,6 +24,8 @@ struct MainCommand {
             try SaveKeyCommand(options: options).run()
         case "secret":
             try SaveSecretCommand(options: options).run()
+        case "secrets":
+            try SaveBulkSecretsCommand(options: options).run()
         case "version":
             VersionCommand(options: options).run()
         case "-h", "--help":
