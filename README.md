@@ -27,6 +27,22 @@ This is **Cloak Swift** - a tool and Tuist plugin to encrypt secrets and then pa
 
 ## Features
 
+#### ☑️ Keep your secrets out of Git
+
+Set up secrets locally outside of the Git repository to avoid them being embedded into the code.
+
+#### ☑️ Encrypt secrets
+
+Create encryption key and encrypt secrets ready for use.
+
+#### ☑️ Access secrets from your app
+
+Generate a Swift file to access the secrets from your app's code.
+
+#### ☑️ Obfuscation
+
+The generated Swift uses obfuscation of the values rather than as raw strings.
+
 &nbsp;
 
 ## Install
@@ -44,7 +60,7 @@ import ProjectDescription
 
 let config = Config(
     plugins: [
-        .git(url: "https://github.com/lordcodes/cloak-swift.git", tag: "{ENTER_LATEST_VERSION}")
+        .git(url: "https://github.com/lordcodes/cloak-swift.git", tag: "v0.1.0")
     ]
 )
 ```
@@ -72,7 +88,7 @@ Support for Homebrew may be planned in the future.
 To install Cloak Swift for use in your own Swift code, add it is a Swift Package Manager dependency within your `Package.swift` file. For help in doing this, please check out the Swift Package Manager documentation.
 
 ```swift
-.package(url: "https://github.com/lordcodes/cloak-swift", exact: "0.0.1")
+.package(url: "https://github.com/lordcodes/cloak-swift", exact: "0.1.0")
 ```
 
 &nbsp;
