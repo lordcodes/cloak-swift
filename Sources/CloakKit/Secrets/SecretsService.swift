@@ -76,12 +76,9 @@ public struct SecretsService {
         let lines = contents.components(separatedBy: .newlines)
         var secrets = [SecretKey: String]()
         for line in lines {
-            let parts = line.split(separator: "=")
-            if parts.count != 2 {
-                continue
-            }
-            let key = parts[0].trimmingCharacters(in: .whitespacesAndNewlines)
-            let value = parts[1].trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let equalsIndex = line.firstIndex(of: "=") else { continue }
+            let key = String(line.prefix(upTo: equalsIndex)).trimmingCharacters(in: .whitespacesAndNewlines)
+            let value = line.suffix(from: line.index(after: equalsIndex)).trimmingCharacters(in: .whitespacesAndNewlines)
             secrets[SecretKey(raw: key)] = value
         }
         return secrets
@@ -194,7 +191,8 @@ public struct SecretsService {
         """
         let access = secretsAccessLevel()
         generatedFile += "\(access)enum \(config.secretsClassName) {\n"
-        for (key, value) in secrets {
+        let sortedSecrets = secrets.sorted { $0.key.raw.lowercased() < $1.key.raw.lowercased() }
+        for (key, value) in sortedSecrets {
             generatedFile += "    \(access)static let \(key.raw.camelcased()) = \"\(value)\"\n"
         }
         generatedFile += "}\n"
