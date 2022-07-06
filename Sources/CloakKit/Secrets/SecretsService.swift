@@ -189,13 +189,30 @@ public struct SecretsService {
         // swiftformat:disable all
 
         """
+        let salt = generateSalt()
         let access = secretsAccessLevel()
         generatedFile += "\(access)enum \(config.secretsClassName) {\n"
         let sortedSecrets = secrets.sorted { $0.key.raw.lowercased() < $1.key.raw.lowercased() }
         for (key, value) in sortedSecrets {
-            generatedFile += "    \(access)static let \(key.raw.camelcased()) = \"\(value)\"\n"
+            let obfuscatedValue = obfuscate(value: value, using: salt)
+            generatedFile += "    \(access)static var \(key.raw.camelcased()): String {\n"
+            generatedFile += "        let encoded: [UInt8] = \(obfuscatedValue)\n"
+            generatedFile += "        return revealObfuscated(value: encoded)\n"
+            generatedFile += "    }\n"
         }
-        generatedFile += "}\n"
+        generatedFile += "\n"
+        generatedFile += "    \(access)static let salt: [UInt8] = \(salt)\n\n"
+        generatedFile += """
+            private static func revealObfuscated(value: [UInt8]) -> String {
+                let saltLength = salt.count
+                var revealed = [UInt8]()
+                for char in value.enumerated() {
+                    revealed.append(char.element ^ salt[char.offset % saltLength])
+                }
+                return String(bytes: revealed, encoding: .utf8)!
+            }
+        """
+        generatedFile += "\n}\n"
         let currentDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
         guard let generatedPath = URL(string: config.secretsFilePath, relativeTo: currentDirectory) else {
             return
@@ -214,6 +231,30 @@ public struct SecretsService {
             return ""
         }
         return "\(access) "
+    }
+
+    private func obfuscate(value: String, using salt: [UInt8]) -> [UInt8] {
+        let valueBytes = [UInt8](value.utf8)
+        let saltLength = salt.count
+        
+        var obfuscated = [UInt8]()
+        for char in valueBytes.enumerated() {
+            obfuscated.append(char.element ^ salt[char.offset % saltLength])
+        }
+        return obfuscated
+    }
+
+    private func generateSalt() -> [UInt8] {
+        let saltData = randomData(length: 64)
+        return [UInt8](saltData)
+    }
+
+    private func randomData(length: Int) -> Data {
+        var data = Data(count: length)
+        _ = data.withUnsafeMutableBytes {
+            SecRandomCopyBytes(kSecRandomDefault, length, $0.baseAddress!)
+        }
+        return data
     }
 }
 
