@@ -121,7 +121,7 @@ The best practice is that the values should be encrypted first.
 
 ### 🖥 Via the Tuist Plugin
 
-Run Cloak's tasks via Tuist.
+Run Cloak's tasks via Tuist. The tool will check paths relative to the working directory for the `.cloak` directory configured above.
 
 ```terminal
 USAGE: tuist cloak <subcommand> [-q|--quiet]
@@ -164,6 +164,8 @@ Generate a Swift file that can be used to access your secrets within your app at
 `tuist cloak generate`
 
 ### 🖥 Via the Standalone CLI
+
+Run Cloak's tasks via a standalone executable. The tool will check paths relative to the working directory for the `.cloak` directory configured above.
 
 ```terminal
 USAGE: cloakswift <subcommand> [-q|--quiet]

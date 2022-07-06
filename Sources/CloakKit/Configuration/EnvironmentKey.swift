@@ -2,7 +2,6 @@
 
 import Foundation
 
-// TODO: Document environment keys and config file keys in README
 enum EnvironmentKey: String {
     case encryptionKey = "CLOAK_ENCRYPTION_KEY"
     case secretsClassName = "CLOAK_SECRETS_CLASS_NAME"
