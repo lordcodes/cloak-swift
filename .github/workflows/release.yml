@@ -24,21 +24,26 @@ jobs:
       with:
         ref: ${{ github.head_ref }}
         fetch-depth: 0
+
     - name: Get previous tag
       id: previous_tag
       uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
     - name: Get next minor version
       if: ${{ github.event.inputs.version == '' }}
       id: calculated_semvers
       uses: "WyriHaximus/github-action-next-semvers@v1"
       with:
         version: ${{ steps.previous_tag.outputs.tag }}
+
     - name: Set version
       run: echo '::set-output name=version::${{ steps.calculated_semvers.outputs.minor }}${{ github.event.inputs.version }}'
       id: semvers
+
     - name: Update Cloak version
       run: |
         sed -i -e "s/current = \".*\"/current = \"${{ steps.semvers.outputs.version }}\"/g" Sources/CloakKit/Version/Version.swift
+
     - name: Build changelog
       id: changelog
       uses: mikepenz/release-changelog-builder-action@v3
@@ -47,11 +52,13 @@ jobs:
         toTag: "main"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Update changelog
       uses: stefanzweifel/changelog-updater-action@v1
       with:
         latest-version: ${{ steps.semvers.outputs.version }}
         release-notes: ${{ steps.changelog.outputs.changelog }}
+
     - name: Commit
       id: auto_commit
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -67,14 +74,22 @@ jobs:
       if: ${{ github.event.inputs.publish == 'true' }}
       with:
         ref: ${{ needs.prepare-release.outputs.commit_hash }}
+
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: "5.6"
+
     - name: Install Tuist
       if: ${{ github.event.inputs.publish == 'true' }}
       run: |
         bash <(curl -Ls https://install.tuist.io)
+
     - name: Tuist archive
       if: ${{ github.event.inputs.publish == 'true' }}
       run: |
         tuist plugin archive
+        
     - name: Create GitHub Release
       if: ${{ github.event.inputs.publish == 'true' }}
       uses: softprops/action-gh-release@v1
