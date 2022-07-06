@@ -26,7 +26,7 @@ public struct SecretsService {
 
     // TODO: Test
     /// Run the service.
-    /// - throws: ExitCode when operation failed.
+    /// - throws: ExitCode when operation ends early due to success or failure.  
     public func run() throws {
         printer.printMessage("🤖 Generating secrets file")
         let secrets = readSecretsFromInputFile()

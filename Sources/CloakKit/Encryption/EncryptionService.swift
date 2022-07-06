@@ -34,7 +34,7 @@ public struct EncryptionService {
     // TODO: Test
     /// Encrypt a value using the encryption key.
     /// - parameter value: Value to encrypt
-    /// - throws: ExitCode when operation failed.
+    /// - throws: ExitCode when operation ends early due to success or failure.  
     public func encrypt(value: String) throws {
         printer.printMessage("🔠 Encrypting \(value)")
 
@@ -69,7 +69,7 @@ public struct EncryptionService {
     // TODO: Test
     /// Decrypt a value using the encryption key.
     /// - parameter value: Value to decrypt
-    /// - throws: ExitCode when operation failed. 
+    /// - throws: ExitCode when operation ends early due to success or failure.
     public func decrypt(value: String) throws {
         printer.printMessage("🔠 Decrypting \(value)")
 
