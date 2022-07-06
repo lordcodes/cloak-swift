@@ -64,14 +64,17 @@ jobs:
     needs: prepare-release
     steps:
     - uses: actions/checkout@v3
+      if: ${{ github.event.inputs.publish == 'true' }}
       with:
         ref: ${{ needs.prepare-release.outputs.commit_hash }}
+    - name: Install Tuist
+      if: ${{ github.event.inputs.publish == 'true' }}
+      run: |
+        bash <(curl -Ls https://install.tuist.io)
     - name: Tuist archive
       if: ${{ github.event.inputs.publish == 'true' }}
-      uses: tuist/tuist-action@0.13.0
-      with:
-        command: 'plugin'
-        arguments: 'archive'
+      run: |
+        tuist plugin archive
     - name: Create GitHub Release
       if: ${{ github.event.inputs.publish == 'true' }}
       uses: softprops/action-gh-release@v1
