@@ -17,7 +17,7 @@
 
 ---
 
-This is **Cloak Swift** - a tool and Tuist plugin to encrypt secrets and then pass them obfuscated into applications.
+This is **Cloak Swift** - a tool and Tuist plugin to encrypt secrets and then pass them in an obfuscated form into applications.
 
 &nbsp;
 
@@ -79,33 +79,97 @@ To install Cloak Swift for use in your own Swift code, add it is a Swift Package
 
 ## Usage
 
+### Set up configuration
+
+Create a configuration file within your project: `.cloak/config`, this file should be kept in Git and shared between contributors. Enter key-value pairs into the file [EnvironmentKey](Sources/CloakKit/Configuration/EnvironmentKey.swift).
+
+* CLOAK_SECRETS_CLASS_NAME -> Name to give the generated Swift enum that contains the secrets in-app.
+* CLOAK_SECRETS_OUTPUT_FILEPATH -> File path to put the generated Swift file.
+* CLOAK_SECRETS_ACCESS_LEVEL -> Swift access level to give to the enum and each secret static property. E.g. public.
+
+Each of these settings can be provided as an environment variable instead of listed in the configuration file. The config file will take precedance.
+
+For example:
+
+```
+CLOAK_SECRETS_CLASS_NAME=AppSecrets
+CLOAK_SECRETS_OUTPUT_FILEPATH=Sources/Generated/AppSecrets.swift
+CLOAK_SECRETS_ACCESS_LEVEL=public
+```
+
+### Configure required secret keys
+
+You can list the required secret keys for your project in a `.cloak/secret-keys` file, which can be kept in Git. This ensures each contributor has provided all required secrets locally. Secret keys should be listed one on each line.
+
+For example:
+
+```
+ANALYTICS_WRITE_KEY
+API_CLIENT_ID
+API_CLIENT_SECRET
+```
+
+### Configure secrets
+
+Each contributor on a project will need to create a file at `.cloak/secrets` that uses the same format as the `config` file but that lists secret key names and values. This file should be added to your project's `.gitignore` to keep them out of Git.
+
+You should also add your encryption key to this file using the key name `CLOAK_ENCRYPTION_KEY`. This will allow the encrypt/decrypt commands to function and will also allow it to be included into the generated Swift file so that your app can decrypt the secrets at runtime in order to use them.
+
+If the secret keys are specified in the required keys file `secret-keys`, then they will be read as environment variables as well, where the environment variables take precendence. This is useful in a CI environment where you take specify them as environment variables and avoid having to write them to a file as you would locally.
+
+The best practice is that the values should be encrypted first.
+
 ### 🖥 Via the Tuist Plugin
 
-Ensure you have fetched with `tuist fetch` and you will then be able to run the plugin's tasks.
+Run Cloak's tasks via Tuist.
 
 ```terminal
-USAGE: tuist cloak <createkey|version> [-q|--quiet]
+USAGE: tuist cloak <subcommand> [-q|--quiet]
 
-ARGUMENTS:
-  <createkey>             Create encryption key.
-  <version>               Prints out the current version of the tool.
+SUBCOMMANDS:
+  createkey  Create encryption key.
+  decrypt    Decrypt a value encrypted using cloak.
+  encrypt    Encrypt a value.
+  generate   Read in secrets, obfuscate them and then generate a Swift file to access them within an app.
+  version    Print version.
 
 OPTIONS:
   -q, --quiet             Silence any output except errors 
 ```
+
+You can obtain help using `tuist cloak --help` and also obtain help for each subcommand using `tuist cloak <subcommand> --help`.
+
+#### Create encryption key
+
+Generates an encryption key, that can then be used within your project to encrypt secrets. This key is then passed into your app so that you can decrypt them at runtime.
+
+`tuist cloak createkey`
+
+#### Encrypt a value
+
+Provide a value and the encrypted version will be returned. Your encryption key should be provided as described above.
+
+`tuist cloak encrypt <value>`
+
+#### Decrypt an encrypted value
+
+Provide an encrypted value and the decrypted version will be returned. Your encryption key should be provided as described above.
+
+`tuist cloak decrypt <encrypted>`
+
+#### Generate a secrets file in-app
+
+Generate a Swift file that can be used to access your secrets within your app at runtime. Certain aspects of the generated file can be customised using the `config` file as described above. The secrets will be obfuscated and included as `[UInt8]`, but with Swift properties to return them as `String` in their usable form.
+
+`tuist cloak generate`
 
 ### 🖥 Via the Standalone CLI
 
 ```terminal
-USAGE: cloakswift <createkey|version> [-q|--quiet]
-
-ARGUMENTS:
-  <createkey>             Create encryption key.
-  <version>               Prints out the current version of the tool.
-
-OPTIONS:
-  -q, --quiet             Silence any output except errors 
+USAGE: cloakswift <subcommand> [-q|--quiet]
 ```
+
+Same usage as the Tuist plugin, except `tuist cloak` is replaced with `cloakswift`.
 
 ### 📦 As a Swift Package
 
@@ -115,9 +179,8 @@ To use Cloak Swift within your own Swift code, import and use the public API of 
 import CloakKit
 
 // Configure printing
-Cloak.configuration.printer = ConsolePrinter(quiet: false)
+Cloak.shared.printer = ConsolePrinter(quiet: false)
 
-// Create key
 EncryptionService().createKey()
 ```
 
