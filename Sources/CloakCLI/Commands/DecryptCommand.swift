@@ -23,9 +23,9 @@ struct DecryptCommand {
 
     private func printHelp() {
         let help = """
-        OVERVIEW: Save encryption key to keychain for use.
+        OVERVIEW: Decrypt an encrypted value.
 
-        USAGE: \(programName) savekey [--quiet]
+        USAGE: \(programName) decrypt <encrypted> [--quiet]
 
         OPTIONS:
           -q, --quiet             Silence any output except errors.
