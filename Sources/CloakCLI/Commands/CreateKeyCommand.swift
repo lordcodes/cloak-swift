@@ -11,10 +11,8 @@ struct CreateKeyCommand {
             return
         }
         let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
-        Cloak.configure { cloak in
-            cloak.printer = ConsolePrinter(quiet: isQuiet)
-        }
-        EncryptionService(service: nil).createKey()
+        Cloak.shared.printer = ConsolePrinter(quiet: isQuiet)
+        EncryptionService().createKey()
     }
 
     private func printHelp() {

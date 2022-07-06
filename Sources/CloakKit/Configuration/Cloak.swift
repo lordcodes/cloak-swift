@@ -12,11 +12,4 @@ public class Cloak {
 
     /// Config loaded from .cloak/config file or environment variables.
     public lazy var config: CloakConfig = ConfigLoader.load()
-
-    /// Configure the shared instance, useful from consumers of CloakKit to set things such as the `Printer`.
-    public static func configure(block: (Cloak) -> Void) {
-        block(shared)
-    }
-
-    let keychain: KeychainAccessor = KeychainAccessor()
 }

@@ -10,20 +10,9 @@ public enum CloakError: Error, Equatable {
     /// Encryption key not found.
     case encryptionKeyNotFound
 
-    /// Keychain operation failed.
-    /// - parameter statusCode: Status code of the keychain error.
-    case keychainFailure(statusCode: OSStatus)
-
     /// Failed to generate secrets file due to missing secrets.
     /// - parameter secrets: Secret keys that have no value saved.
     case missingSecrets(secrets: [SecretKey])
-
-    /// No value was entered for the secret key.
-    /// - parameter key: The secret key.
-    case secretKeyNoValueEntered(key: SecretKey)
-
-    /// Service wasn't set in a config file, environment variable or passed via command line.
-    case serviceMissing
 
     /// Failed to write secrets to generated file.
     case writeSecretsToGeneratedFileFailed
@@ -52,15 +41,9 @@ extension CloakError: CustomStringConvertible {
             return  "Encryption failed"
         case .encryptionKeyNotFound:
             return "Encryption key not found in keychain"
-        case let .keychainFailure(statusCode):
-            return "Keychain error, status code \(statusCode)"
         case let .missingSecrets(secrets):
             let secretsMessage = secrets.map { $0.raw }.joined(separator: ", ")
             return "Failed to generate secrets file due to missing secrets.\n\n\(secretsMessage)"
-        case let .secretKeyNoValueEntered(key):
-            return "No value was entered for secret key \(key.raw)"
-        case .serviceMissing:
-            return "Service wasn't set in a config file, environment variable or passed via command line"
         case .writeSecretsToGeneratedFileFailed:
             return "Failed to write secrets to generated file"
         case let .otherError(message):

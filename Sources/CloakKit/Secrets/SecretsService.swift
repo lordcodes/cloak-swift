@@ -3,74 +3,55 @@
 import Foundation
 import Security
 
-/// Closure to read secret value, such as from standard input in a CLI tool.
-public typealias SecretReader = () -> String?
-
-/// Service for interacting with secrets such as saving to keychain and generating secrets file.
+/// Service for resolving secrets and then generating a secrets file to use in-app.
 public struct SecretsService {
-    private let interactiveMode: Bool
-    private let service: String?
-    private let readSecret: SecretReader
-    private let keychain: KeychainAccessor
     private let printer: Printer
     private let config: CloakConfig
 
     /// Create the service.
-    /// - parameter interactiveMode: Whether secret value can be captured interactively via `readSecret`.
-    /// - parameter service: Service for finding encryption key in keychain.
-    /// - parameter readSecret: Closure to capture the value for a secret.
-    public init(interactiveMode: Bool, service: String?, readSecret: @escaping SecretReader) {
+    public init() {
         self.init(
-            interactiveMode: interactiveMode,
-            service: service,
-            readSecret: readSecret,
-            keychain: Cloak.shared.keychain,
             printer: Cloak.shared.printer,
             config: Cloak.shared.config
         )
     }
 
     init(
-        interactiveMode: Bool,
-        service: String?,
-        readSecret: @escaping SecretReader,
-        keychain: KeychainAccessor,
         printer: Printer,
         config: CloakConfig
     ) {
-        self.interactiveMode = interactiveMode
-        self.service = service
-        self.readSecret = readSecret
-        self.keychain = keychain
         self.printer = printer
         self.config = config
     }
 
     // TODO: Test
-    /// Save a secret to the keychain.
-    /// - parameter key: Secret key name.
-    /// - parameter value: Secret key value.
-    /// - throws: ExitCode when operation failed. 
-    public func saveSecret(key: SecretKey, value: String) throws {
-        printer.printMessage("💾 Saving secret \(key.raw) to the keychain")
-        try saveSecrets([key: value])
-        printer.printMessage("Secret saved successfully")
-    }
-
-    // TODO: Test
-    /// Save secrets that are listed in bulk within a file.
-    /// - parameter file: File containing a list of secrets and their values.
+    /// Run the service.
     /// - throws: ExitCode when operation failed.
-    public func saveBulkSecrets(filepath: String) throws {
-        printer.printMessage("💾 Saving secrets from a file to the keychain")
-        let secrets = readSecretsFromBulkFile(from: filepath)
-        try saveSecrets(secrets)
-        printer.printMessage("Secrets saved successfully")
+    public func run() throws {
+        printer.printMessage("🤖 Generating secrets file")
+        let secrets = readSecretsFromInputFile()
+        let requiredSecretKeys = readRequiredSecretKeys()
+        let environmentSecrets = findSecretsFromEnvironment(with: requiredSecretKeys)
+        let mergedSecrets = secrets.merging(environmentSecrets) { _, environment in environment }
+        let missingSecretKeys = requiredSecretKeys.filter { mergedSecrets[$0] == nil }
+
+        if !missingSecretKeys.isEmpty {
+            printer.printMessage("Not all required secrets were provided through input file and/or environment")
+            printer.printError(.missingSecrets(secrets: missingSecretKeys))
+        } else {
+            printer.printMessage("All secrets found, generating secrets file")
+            try generateSecretsFile(with: mergedSecrets)
+        }
     }
 
-    private func readSecretsFromBulkFile(from filepath: String) -> [SecretKey: String] {
-        printer.printMessage("Reading secrets and values from \(filepath)")
-        guard let contents = try? String(contentsOfFile: filepath, encoding: .utf8) else {
+    private func readSecretsFromInputFile() -> [SecretKey: String] {
+        let secretsInputFilePath = ".cloak/.secrets"
+        guard FileManager.default.fileExists(atPath: secretsInputFilePath) else {
+            printer.printMessage("Secrets input file not found at \(secretsInputFilePath)")
+            return [:]
+        }
+        printer.printMessage("Reading secrets and values from \(secretsInputFilePath)")
+        guard let contents = try? String(contentsOfFile: secretsInputFilePath, encoding: .utf8) else {
             return [:]
         }
         let lines = contents.components(separatedBy: .newlines)
@@ -81,103 +62,36 @@ public struct SecretsService {
             let value = line.suffix(from: line.index(after: equalsIndex)).trimmingCharacters(in: .whitespacesAndNewlines)
             secrets[SecretKey(raw: key)] = value
         }
+        printer.printMessage("Secrets and values read from \(secretsInputFilePath)")
         return secrets
     }
 
-    // TODO: Test
-    /// Delete a secret from the keychain.
-    /// - parameter key: Secret key name.
-    /// - throws: ExitCode when operation failed.
-    public func deleteSecret(key: SecretKey) throws {
-        printer.printMessage("🗑 Deleting secret \(key.raw) from the keychain")
-        let service = try findService()
-        try handleFatalError {
-            try keychain.delete(account: key.raw, service: service)
-        }
-    }
-
-    // TODO: Test
-    /// Generate a Swift file to access secrets from the target application.
-    /// - throws: ExitCode when operation failed.
-    public func generateSecretsFile() throws {
-        printer.printMessage("🤖 Generating secrets file")
-        let secretKeys = readSecretKeys()
-        printer.printMessage("Secret keys read from .cloak/secret-keys")
-        let secretValues = try findSecrets(with: secretKeys)
-        printer.printMessage("Secrets retrieved from keychain")
-        let missingSecretKeys = secretKeys.filter { secretValues[$0] == nil }
-        if interactiveMode, !missingSecretKeys.isEmpty {
-            printer.printMessage("Interactive mode, requesting missing secrets and then generating secrets file")
-            let missingSecretValues = try requestSecrets(keys: missingSecretKeys)
-            let allSecrets = secretValues.merging(missingSecretValues) { first, second in first }
-            try generateSecretsFile(with: allSecrets)
-        } else if !missingSecretKeys.isEmpty {
-            printer.printMessage("Non-interactive mode, printing out missing secrets")
-            printer.printError(.missingSecrets(secrets: missingSecretKeys))
-        } else {
-            printer.printMessage("All secrets found, generating secrets file")
-            try generateSecretsFile(with: secretValues)
-        }
-    }
-
-    private func readSecretKeys() -> [SecretKey] {
+    private func readRequiredSecretKeys() -> [SecretKey] {
         let pathUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
             .appendingPathComponent(".cloak")
             .appendingPathComponent("secret-keys")
+        guard FileManager.default.fileExists(atPath: pathUrl.path) else {
+            printer.printMessage("Required secrets file not found at .cloak/secret-keys so won't check for missing secrets")
+            return []
+        }
         guard let contents = try? String(contentsOfFile: pathUrl.path, encoding: .utf8) else {
             return []
         }
-        return contents.components(separatedBy: .newlines)
+        let requiredKeys = contents.components(separatedBy: .newlines)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .map(SecretKey.init(raw:))
+        printer.printMessage("Required secret keys read from .cloak/secret-keys")
+        return requiredKeys
     }
 
-    private func findSecrets(with keys: [SecretKey]) throws -> [SecretKey: String] {
+    private func findSecretsFromEnvironment(with keys: [SecretKey]) -> [SecretKey: String] {
         var values: [SecretKey: String] = [:]
         for key in keys {
             values[key] = environment(for: key.raw)
-            if values[key] == nil {
-                let service = try findService()
-                values[key] = try? keychain.retrieve(for: key.raw, service: service)
-            }
         }
+        printer.printMessage("Secrets retrieved from environment")
         return values
-    }
-
-    private func findService() throws -> String {
-        guard let service = config.service ?? service else {
-            printer.printError(.serviceMissing)
-            throw ExitCode.failure
-        }
-        return service
-    }
-
-    private func requestSecrets(keys: [SecretKey]) throws -> [SecretKey: String] {
-        var newValues = [SecretKey: String]()
-        for secret in keys {
-            var newValue: String?
-            while newValue == nil || newValue?.isEmpty == true {
-                printer.printForced("Please enter value for \(secret.raw):")
-                newValue = readSecret()?.trimmingCharacters(in: .whitespacesAndNewlines)
-            }
-            guard let secretValue = newValue else {
-                printer.printError(.secretKeyNoValueEntered(key: secret))
-                throw ExitCode.failure
-            }
-            newValues[secret] = secretValue
-        }
-        try saveSecrets(newValues)
-        return newValues
-    }
-
-    private func saveSecrets(_ secrets: [SecretKey: String]) throws {
-        let service = try findService()
-        for (key, value) in secrets {
-            try handleFatalError {
-                try keychain.save(value, for: key.raw, service: service)
-            }
-        }
     }
 
     private func generateSecretsFile(with secrets: [SecretKey: String]) throws {
@@ -214,7 +128,7 @@ public struct SecretsService {
         """
         generatedFile += "\n}\n"
         let currentDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        guard let generatedPath = URL(string: config.secretsFilePath, relativeTo: currentDirectory) else {
+        guard let generatedPath = URL(string: config.secretsOutputFilePath, relativeTo: currentDirectory) else {
             return
         }
         do {
@@ -236,7 +150,7 @@ public struct SecretsService {
     private func obfuscate(value: String, using salt: [UInt8]) -> [UInt8] {
         let valueBytes = [UInt8](value.utf8)
         let saltLength = salt.count
-        
+
         var obfuscated = [UInt8]()
         for char in valueBytes.enumerated() {
             obfuscated.append(char.element ^ salt[char.offset % saltLength])

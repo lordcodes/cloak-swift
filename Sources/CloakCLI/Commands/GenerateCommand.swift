@@ -12,33 +12,18 @@ struct GenerateCommand {
             return
         }
         let isQuiet = options.contains { $0 == "-q" || $0 == "--quiet" }
-        Cloak.configure { cloak in
-            cloak.printer = ConsolePrinter(quiet: isQuiet)
-        }
-        let secretsService = SecretsService(
-            interactiveMode: !programName.contains("tuist"),
-            service: findService(),
-            readSecret: { readLine() }
-        )
-        try secretsService.generateSecretsFile()
-    }
-
-    private func findService() -> String? {
-        guard let serviceIndex = options.firstIndex(where: { $0 == "-s" || $0 == "--service" }), options.count > serviceIndex + 1 else {
-            return nil
-        }
-        return options[serviceIndex + 1]
+        Cloak.shared.printer = ConsolePrinter(quiet: isQuiet)
+        try SecretsService().run()
     }
 
     private func printHelp() {
         let help = """
-        OVERVIEW: Generate secrets Swift file for use in-app, missing secrets are requested and added to the keychain.
-        When ran from Tuist, interactive mode is disabled so it will print out missing secrets that need to be provided instead.
+        OVERVIEW: Generate secrets Swift file for use in-app, with secrets being read from the secrets input file.
+        If a .cloak/secret-keys file is provided, then any missing keys from the input file will be printed out.
 
-        USAGE: \(programName) generate [--service SERVICE] [--quiet]
+        USAGE: \(programName) generate [--quiet]
 
         OPTIONS:
-          -s, --service           Service name for entries in Keychain (optional, can be provided through environment or config file).
           -q, --quiet             Silence any output except errors.
           -h, --help              Show help information.
 

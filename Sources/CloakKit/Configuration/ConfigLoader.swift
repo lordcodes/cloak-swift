@@ -7,10 +7,9 @@ enum ConfigLoader {
     static func load() -> CloakConfig {
         let properties = configFileProperties()
         return CloakConfig(
-            encryptionKey: properties.readProperty(for: .encryptionKey),
-            service: properties.readProperty(for: .service),
+            encryptionKey: findEncryptionKey(),
             secretsClassName: properties.readProperty(for: .secretsClassName) ?? "CloakSecrets",
-            secretsFilePath: properties.readProperty(for: .secretsFilePath) ?? "CloakSecrets.swift",
+            secretsOutputFilePath: properties.readProperty(for: .secretsOutputFilePath) ?? "CloakSecrets.swift",
             secretsAccessLevel: properties.readProperty(for: .secretsAccessLevel)
         )
     }
@@ -34,6 +33,24 @@ enum ConfigLoader {
             properties[key] = value
         }
         return properties
+    }
+
+    private static func findEncryptionKey() -> String? {
+        if let encryptionKey = environment(for: .encryptionKey) {
+            return encryptionKey
+        }
+        guard let contents = try? String(contentsOfFile: ".cloak/.secrets", encoding: .utf8) else {
+            return nil
+        }
+        let lines = contents.components(separatedBy: .newlines)
+        for line in lines {
+            guard let equalsIndex = line.firstIndex(of: "=") else { continue }
+            let key = String(line.prefix(upTo: equalsIndex)).trimmingCharacters(in: .whitespacesAndNewlines)
+            if key == EnvironmentKey.encryptionKey.rawValue {
+                return line.suffix(from: line.index(after: equalsIndex)).trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        return nil
     }
 }
 

@@ -17,9 +17,7 @@ struct VersionCommand {
     }
 
     private func performVersion() {
-        Cloak.configure { cloak in
-            cloak.printer = ConsolePrinter(quiet: false)
-        }
+        Cloak.shared.printer = ConsolePrinter(quiet: false)
         VersionService().run()
     }
 

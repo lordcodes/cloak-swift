@@ -14,18 +14,10 @@ struct MainCommand {
             CreateKeyCommand(options: options).run()
         case "decrypt":
             try DecryptCommand(options: options).run()
-        case "delete":
-            try DeleteSecretCommand(options: options).run()
         case "encrypt":
             try EncryptCommand(options: options).run()
         case "generate":
             try GenerateCommand(options: options).run()
-        case "savekey":
-            try SaveKeyCommand(options: options).run()
-        case "secret":
-            try SaveSecretCommand(options: options).run()
-        case "secrets":
-            try SaveBulkSecretsCommand(options: options).run()
         case "version":
             VersionCommand(options: options).run()
         case "-h", "--help":
@@ -58,7 +50,9 @@ struct MainCommand {
 
         SUBCOMMANDS:
           createkey               Create encryption key.
-          savekey                 Save encryption key to keychain for use.
+          decrypt                 Decrypt a value encrypted using cloak.
+          encrypt                 Encrypt a value.
+          generate                Read in secrets, obfuscate them and then generate a Swift file to access them within an app.
           version                 Print version.
 
         See '\(programName) <subcommand> --help' for detailed help.
