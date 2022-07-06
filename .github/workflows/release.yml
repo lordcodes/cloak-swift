@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version for the release (x.x.x), if not specified then next minor.
+        required: false
+      publish:
+        description: Should publish?
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semvers.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+      commit_hash: ${{ steps.auto_commit.outputs.commit_hash }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+    - name: Get previous tag
+      id: previous_tag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+    - name: Get next minor version
+      if: ${{ github.event.inputs.version == '' }}
+      id: calculated_semvers
+      uses: "WyriHaximus/github-action-next-semvers@v1"
+      with:
+        version: ${{ steps.previous_tag.outputs.tag }}
+    - name: Set version
+      run: echo '::set-output name=version::${{ steps.calculated_semvers.outputs.minor }}${{ github.event.inputs.version }}'
+      id: semvers
+    - name: Update Cloak version
+      run: |
+        sed -i -e "s/current = \".*\"/current = \"${{ steps.semvers.outputs.version }}\"/g" Sources/CloakKit/Version/Version.swift
+    - name: Build changelog
+      id: changelog
+      uses: mikepenz/release-changelog-builder-action@v3
+      with:
+        configuration: ".github/changelog-configuration.json"
+        toTag: "main"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update changelog
+      uses: stefanzweifel/changelog-updater-action@v1
+      with:
+        latest-version: ${{ steps.semvers.outputs.version }}
+        release-notes: ${{ steps.changelog.outputs.changelog }}
+    - name: Commit
+      id: auto_commit
+      uses: stefanzweifel/git-auto-commit-action@v4
+      if: ${{ github.event.inputs.publish == 'true' }}
+      with:
+        commit_message: "[Release] Cloak ${{ steps.semvers.outputs.version }}"
+
+  release:
+    runs-on: macos-latest
+    needs: prepare-release
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ needs.prepare-release.outputs.commit_hash }}
+    - name: Tuist archive
+      if: ${{ github.event.inputs.publish == 'true' }}
+      uses: tuist/tuist-action@0.13.0
+      with:
+        command: 'plugin'
+        arguments: 'archive'
+    - name: Create GitHub Release
+      if: ${{ github.event.inputs.publish == 'true' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        files: cloak.tuist-plugin.zip
+        name: ${{ needs.prepare-release.outputs.version }}
+        tag_name: v${{ needs.prepare-release.outputs.version }}
+        body: ${{ needs.prepare-release.outputs.changelog }}
+        target_commitish: ${{ needs.prepare-release.outputs.commit_hash }}
