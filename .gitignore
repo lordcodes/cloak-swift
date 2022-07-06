@@ -89,5 +89,5 @@ fastlane/test_output
 
 iOSInjectionProject/
 
-# Cloak configuration
-.cloak
+# Secrets
+.cloak/secrets
