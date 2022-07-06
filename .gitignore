@@ -90,4 +90,4 @@ fastlane/test_output
 iOSInjectionProject/
 
 # Secrets
-.cloak/secrets
+.cloak/.secrets

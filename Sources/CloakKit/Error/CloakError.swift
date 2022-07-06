@@ -40,7 +40,7 @@ extension CloakError: CustomStringConvertible {
         case .encryptionFailed:
             return  "Encryption failed"
         case .encryptionKeyNotFound:
-            return "Encryption key not found in keychain"
+            return "Encryption key not found"
         case let .missingSecrets(secrets):
             let secretsMessage = secrets.map { $0.raw }.joined(separator: ", ")
             return "Failed to generate secrets file due to missing secrets.\n\n\(secretsMessage)"

@@ -39,7 +39,10 @@ enum ConfigLoader {
         if let encryptionKey = environment(for: .encryptionKey) {
             return encryptionKey
         }
-        guard let contents = try? String(contentsOfFile: ".cloak/.secrets", encoding: .utf8) else {
+        let pathUrl = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent(".cloak")
+            .appendingPathComponent(".secrets")
+        guard let contents = try? String(contentsOfFile: pathUrl.path, encoding: .utf8) else {
             return nil
         }
         let lines = contents.components(separatedBy: .newlines)

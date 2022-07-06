@@ -32,7 +32,7 @@ public struct EncryptionService {
     }
 
     // TODO: Test
-    /// Encrypt a value using encryption key from keychain.
+    /// Encrypt a value using the encryption key.
     /// - parameter value: Value to encrypt
     /// - throws: ExitCode when operation failed.
     public func encrypt(value: String) throws {
@@ -67,7 +67,7 @@ public struct EncryptionService {
     }
 
     // TODO: Test
-    /// Decrypt a value using encryption key from keychain.
+    /// Decrypt a value using the encryption key.
     /// - parameter value: Value to decrypt
     /// - throws: ExitCode when operation failed. 
     public func decrypt(value: String) throws {
