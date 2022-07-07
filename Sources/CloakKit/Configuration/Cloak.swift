@@ -13,3 +13,7 @@ public class Cloak {
     /// Config loaded from .cloak/config file or environment variables.
     public lazy var config: CloakConfig = ConfigLoader.load()
 }
+
+var printer: Printer {
+    Cloak.shared.printer
+}

@@ -5,22 +5,14 @@ import Security
 
 /// Service for resolving secrets and then generating a secrets file to use in-app.
 public struct SecretsService {
-    private let printer: Printer
     private let config: CloakConfig
 
     /// Create the service.
     public init() {
-        self.init(
-            printer: Cloak.shared.printer,
-            config: Cloak.shared.config
-        )
+        self.init(config: Cloak.shared.config)
     }
 
-    init(
-        printer: Printer,
-        config: CloakConfig
-    ) {
-        self.printer = printer
+    init(config: CloakConfig) {
         self.config = config
     }
 

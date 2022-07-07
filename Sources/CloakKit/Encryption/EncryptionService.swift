@@ -5,19 +5,14 @@ import Foundation
 
 /// Service for creating encryption keys and encrypting secrets.
 public struct EncryptionService {
-    private let printer: Printer
     private let config: CloakConfig
 
     /// Create the service.
     public init() {
-        self.init(
-            printer: Cloak.shared.printer,
-            config: Cloak.shared.config
-        )
+        self.init(config: Cloak.shared.config)
     }
 
-    init(printer: Printer, config: CloakConfig) {
-        self.printer = printer
+    init(config: CloakConfig) {
         self.config = config
     }
 
