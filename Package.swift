@@ -14,7 +14,7 @@ let package = Package(
             name: "cloakswift",
             targets: ["CloakCLI"]
         ),
-        .library(name: "CloakKit", targets: ["CloakKit"])
+        .library(name: "CloakKit", targets: ["CloakKit"]),
     ],
     dependencies: [],
     targets: [

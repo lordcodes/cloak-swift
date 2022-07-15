@@ -18,7 +18,7 @@ public struct SecretsService {
 
     // TODO: Test
     /// Run the service.
-    /// - throws: ExitCode when operation ends early due to success or failure.  
+    /// - throws: ExitCode when operation ends early due to success or failure.
     public func run() throws {
         printer.printMessage("🤖 Generating secrets file")
         let secrets = readSecretsFromInputFile()
@@ -169,8 +169,7 @@ private extension String {
         guard !isEmpty else {
             return ""
         }
-        return self
-            .split(separator: "_")
+        return split(separator: "_")
             .map { String($0) }
             .enumerated()
             .map { $0.offset > 0 ? $0.element.capitalized : $0.element.lowercased() }

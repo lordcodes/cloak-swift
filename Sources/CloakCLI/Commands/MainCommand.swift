@@ -1,11 +1,11 @@
 // Copyright © 2022 Andrew Lord.
 
+import CloakKit
 import Darwin
 import Foundation
-import CloakKit
 
 struct MainCommand {
-     let arguments: [String]
+    let arguments: [String]
 
     public func run() throws {
         let (subcommand, options) = try extractSubcommand()
@@ -20,7 +20,8 @@ struct MainCommand {
             try GenerateCommand(options: options).run()
         case "version":
             VersionCommand(options: options).run()
-        case "-h", "--help":
+        case "-h",
+             "--help":
             printHelp()
         default:
             try printUnexpectedArgumentError(argument: subcommand)
