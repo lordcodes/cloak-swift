@@ -1,0 +1,18 @@
+# format options
+
+--ifdef noindent
+--stripunusedargs closure-only
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--maxwidth 150
+
+
+# rules
+
+--enable wrapEnumCases,wrapSwitchCases
+
+
+# file options
+
+--exclude .build,Derived,Tuist/Dependencies

@@ -38,11 +38,11 @@ extension CloakError: CustomStringConvertible {
     private var reason: String {
         switch self {
         case .encryptionFailed:
-            return  "Encryption failed"
+            return "Encryption failed"
         case .encryptionKeyNotFound:
             return "Encryption key not found"
         case let .missingSecrets(secrets):
-            let secretsMessage = secrets.map { $0.raw }.joined(separator: ", ")
+            let secretsMessage = secrets.map(\.raw).joined(separator: ", ")
             return "Failed to generate secrets file due to missing secrets.\n\n\(secretsMessage)"
         case .writeSecretsToGeneratedFileFailed:
             return "Failed to write secrets to generated file"

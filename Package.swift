@@ -1,4 +1,4 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 5.5
 
 import PackageDescription
 
@@ -14,7 +14,7 @@ let package = Package(
             name: "cloakswift",
             targets: ["CloakCLI"]
         ),
-        .library(name: "CloakKit", targets: ["CloakKit"])
+        .library(name: "CloakKit", targets: ["CloakKit"]),
     ],
     dependencies: [],
     targets: [

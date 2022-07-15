@@ -16,17 +16,35 @@ jobs:
       name: 'Cache .build folder'
       with:
         path: .build
-        key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+        key: ${{ runner.os }}-spm-v1-${{ hashFiles('**/Package.resolved') }}
         restore-keys: |
-          ${{ runner.os }}-spm-
-
-    - name: Setup Swift
-      uses: swift-actions/setup-swift@v1
-      with:
-        swift-version: "5.6"
+          ${{ runner.os }}-spm-v1-
 
     - name: Build
       run: swift build -v
 
     - name: Run tests
       run: swift test -v
+
+  lint:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Tuist
+      run: |
+        bash <(curl -Ls https://install.tuist.io)
+    
+    - name: Tuist fetch
+      run: |
+        tuist fetch
+    
+    - name: SwiftFormat
+      run: |
+        mkdir -p .build/reports
+        tuist swiftformat lint --report .build/reports/swiftformat.json
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: lint-build-reports
+        path: .build/reports

@@ -9,7 +9,8 @@ struct VersionCommand {
         switch options.first {
         case .none:
             performVersion()
-        case .some("-h"), .some("--help"):
+        case .some("-h"),
+             .some("--help"):
             printHelp()
         case let .some(other):
             printUnexpectedOptionError(option: other)
@@ -34,7 +35,7 @@ struct VersionCommand {
 
         OPTIONS:
           -h, --help              Show help information.
-        
+
         """
         print(help)
     }
