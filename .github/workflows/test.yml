@@ -43,6 +43,11 @@ jobs:
       run: |
         mkdir -p .build/reports
         tuist swiftformat lint --report .build/reports/swiftformat.json
+    
+    - name: SwiftLint
+      run: |
+        mkdir -p .build/reports
+        tuist swiftlint --report .build/reports/swiftlint.json
 
     - uses: actions/upload-artifact@v3
       with:

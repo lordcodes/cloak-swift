@@ -1,0 +1,61 @@
+disabled_rules:
+  - cyclomatic_complexity
+  - file_length
+  - function_body_length
+  - todo
+  - type_body_length
+  - weak_delegate
+
+opt_in_rules:
+  - anyobject_protocol
+  - closure_spacing
+  - collection_alignment
+  - fallthrough
+  - identical_operands
+  - legacy_multiple
+  - test_case_accessibility
+  - toggle_bool
+  - unowned_variable_capture
+
+excluded:
+  - ".build"
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 2
+  max_length:
+    warning: 100
+    error: 100
+
+function_parameter_count:
+  warning: 10
+
+large_tuple:
+  warning: 3
+  error: 4
+
+line_length:
+  warning: 150
+  error: 250
+  ignores_function_declarations: true
+
+nesting:
+  type_level:
+    warning: 5
+    error: 5
+  function_level:
+    error: 5
+
+private_unit_test:
+  severity: error
+
+trailing_comma:
+  mandatory_comma: true
+
+type_name:
+  min_length:
+    error: 1
+  max_length:
+    warning: 100
+    error: 100
