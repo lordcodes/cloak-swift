@@ -131,7 +131,9 @@ Each contributor on a project will need to create a file at `.cloak/secrets` tha
 
 You should also add your encryption key to this file using the key name `CLOAK_ENCRYPTION_KEY`. This will allow the encrypt/decrypt commands to function and will also allow it to be included into the generated Swift file so that your app can decrypt the secrets at runtime in order to use them.
 
-If the secret keys are specified in the required keys file `secret-keys`, then they will be read as environment variables as well, where the environment variables take precendence. This is useful in a CI environment where you take specify them as environment variables and avoid having to write them to a file as you would locally.
+If the secret keys are specified in the required keys file `secret-keys`, then they will be read as environment variables as well, where the environment variables take precendence. This is useful in a CI environment where you can specify them as environment variables and avoid having to write them to a file as you would locally.
+
+IMPORTANT NOTE: The secrets aren't read as environment variables correctly when using Cloak as a Tuist plugin, due to the environment Tuist plugins are executed in. Therefore, it is best to write the secrets to a file in a setup step of your CI workflow.
 
 The best practice is that the values should be encrypted first.
 
