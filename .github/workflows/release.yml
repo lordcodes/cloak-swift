@@ -95,3 +95,8 @@ jobs:
         tag_name: v${{ needs.prepare-release.outputs.version }}
         body: ${{ needs.prepare-release.outputs.changelog }}
         target_commitish: ${{ needs.prepare-release.outputs.commit_hash }}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: cloak.tuist-plugin.zip
+        path: cloak.tuist-plugin.zip

@@ -47,7 +47,7 @@ jobs:
     - name: SwiftLint
       run: |
         mkdir -p .build/reports
-        tuist swiftlint --report .build/reports/swiftlint.json
+        tuist swiftlint --reporter html > .build/reports/swiftlint.html
 
     - uses: actions/upload-artifact@v3
       with:
