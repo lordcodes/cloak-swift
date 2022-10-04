@@ -60,7 +60,7 @@ import ProjectDescription
 
 let config = Config(
     plugins: [
-        .git(url: "https://github.com/lordcodes/cloak-swift.git", tag: "v0.1.0")
+        .git(url: "https://github.com/lordcodes/cloak-swift.git", tag: "vTAG")
     ]
 )
 ```
@@ -88,7 +88,7 @@ Support for Homebrew may be planned in the future.
 To install Cloak Swift for use in your own Swift code, add it is a Swift Package Manager dependency within your `Package.swift` file. For help in doing this, please check out the Swift Package Manager documentation.
 
 ```swift
-.package(url: "https://github.com/lordcodes/cloak-swift", exact: "0.1.0")
+.package(url: "https://github.com/lordcodes/cloak-swift", exact: "VERSION")
 ```
 
 &nbsp;
