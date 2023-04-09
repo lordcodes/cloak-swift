@@ -17,7 +17,7 @@
 
 ---
 
-This is **Cloak Swift** - a tool and Tuist plugin to encrypt secrets and then pass them in an obfuscated form into applications.
+This is **Cloak Swift** - a tool and Tuist plugin to encrypt secrets and then pass them in an obfuscated form into Swift applications.
 
 &nbsp;
 
