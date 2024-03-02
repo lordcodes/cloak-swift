@@ -7,10 +7,6 @@ let package = Package(
     platforms: [.macOS(.v11)],
     products: [
         .executable(
-            name: "tuist-cloak",
-            targets: ["CloakCLI"]
-        ),
-        .executable(
             name: "cloakswift",
             targets: ["CloakCLI"]
         ),
