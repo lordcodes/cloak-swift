@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# mise description="Run code linting"
+# mise sources=["**/*.swift"]
+
+OUTPUT_DIR="build/lint/reports"
+mkdir -p "${OUTPUT_DIR}"
+
+swiftformat . --lint --report "${OUTPUT_DIR}/swiftformat.json"
+swiftlint --strict --quiet --reporter html --output "${OUTPUT_DIR}/swiftlint.html"

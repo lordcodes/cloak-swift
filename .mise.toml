@@ -1,0 +1,9 @@
+[tools]
+swiftformat = "0.53.1"
+swiftlint = "0.54.0"
+
+[settings]
+legacy_version_file = false
+yes = true
+disable_tools = ['node', 'ruby', 'go']
+experimental = true
