@@ -19,9 +19,5 @@ private func extractProgramName() -> String {
     guard let program = CommandLine.arguments.first else {
         exit(EXIT_SUCCESS)
     }
-    var programName = URL(fileURLWithPath: program).lastPathComponent
-    if programName == "tuist-cloak" {
-        programName = "tuist cloak"
-    }
-    return programName
+    return URL(fileURLWithPath: program).lastPathComponent
 }
