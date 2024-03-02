@@ -17,7 +17,7 @@
 
 ---
 
-This is **Cloak Swift** - a tool and Tuist plugin to encrypt secrets and then pass them in an obfuscated form into Swift applications.
+This is **Cloak Swift** - a CLI tool to encrypt secrets and then pass them in an obfuscated form into Swift applications.
 
 &nbsp;
 
@@ -46,24 +46,6 @@ The generated Swift uses obfuscation of the values rather than as raw strings.
 &nbsp;
 
 ## Install
-
-The primary intention was to use Cloak Swift as a [Tuist](https://github.com/tuist/tuist) plugin, however, it can also be used as a standard CLI tool as well.
-
-### ▶︎ 🖥 As a Tuist Plugin
-
-To set up as a Tuist plugin in your project simply follow the [Tuist plugin install instructions](https://docs.tuist.io/plugins/using-plugins/) using the [latest version](https://github.com/lordcodes/cloak-swift/releases/latest).
-
-Add the plugin to `Config.swift`.
-
-```swift
-import ProjectDescription
-
-let config = Config(
-    plugins: [
-        .git(url: "https://github.com/lordcodes/cloak-swift.git", tag: "vTAG")
-    ]
-)
-```
 
 ### ▶︎ 🖥 Standalone via Swift Package Manager
 
@@ -133,16 +115,14 @@ You should also add your encryption key to this file using the key name `CLOAK_E
 
 If the secret keys are specified in the required keys file `secret-keys`, then they will be read as environment variables as well, where the environment variables take precendence. This is useful in a CI environment where you can specify them as environment variables and avoid having to write them to a file as you would locally.
 
-IMPORTANT NOTE: The secrets aren't read as environment variables correctly when using Cloak as a Tuist plugin, due to the environment Tuist plugins are executed in. Therefore, it is best to write the secrets to a file in a setup step of your CI workflow.
-
 The best practice is that the values should be encrypted first.
 
-### 🖥 Via the Tuist Plugin
+### 🖥 Via the Standalone CLI
 
-Run Cloak's tasks via Tuist. The tool will check paths relative to the working directory for the `.cloak` directory configured above.
+Run Cloak's tasks via a CLI. The tool will check paths relative to the working directory for the `.cloak` directory configured above.
 
 ```terminal
-USAGE: tuist cloak <subcommand> [-q|--quiet]
+USAGE: cloakswift <subcommand> [-q|--quiet]
 
 SUBCOMMANDS:
   createkey  Create encryption key.
@@ -155,41 +135,31 @@ OPTIONS:
   -q, --quiet             Silence any output except errors 
 ```
 
-You can obtain help using `tuist cloak --help` and also obtain help for each subcommand using `tuist cloak <subcommand> --help`.
+You can obtain help using `cloakswift --help` and also obtain help for each subcommand using `cloakswift <subcommand> --help`.
 
 #### Create encryption key
 
 Generates an encryption key, that can then be used within your project to encrypt secrets. This key is then passed into your app so that you can decrypt them at runtime.
 
-`tuist cloak createkey`
+`cloakswift createkey`
 
 #### Encrypt a value
 
 Provide a value and the encrypted version will be returned. Your encryption key should be provided as described above.
 
-`tuist cloak encrypt <value>`
+`cloakswift encrypt <value>`
 
 #### Decrypt an encrypted value
 
 Provide an encrypted value and the decrypted version will be returned. Your encryption key should be provided as described above.
 
-`tuist cloak decrypt <encrypted>`
+`cloakswift decrypt <encrypted>`
 
 #### Generate a secrets file in-app
 
 Generate a Swift file that can be used to access your secrets within your app at runtime. Certain aspects of the generated file can be customised using the `config` file as described above. The secrets will be obfuscated and included as `[UInt8]`, but with Swift properties to return them as `String` in their usable form.
 
-`tuist cloak generate`
-
-### 🖥 Via the Standalone CLI
-
-Run Cloak's tasks via a standalone executable. The tool will check paths relative to the working directory for the `.cloak` directory configured above.
-
-```terminal
-USAGE: cloakswift <subcommand> [-q|--quiet]
-```
-
-Same usage as the Tuist plugin, except `tuist cloak` is replaced with `cloakswift`.
+`cloakswift generate`
 
 ### 📦 As a Swift Package
 
