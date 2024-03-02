@@ -2,7 +2,7 @@
 # mise description="Run code formatting"
 # mise sources=["**/*.swift"]
 
-OUTPUT_DIR="build/lint/reports"
+OUTPUT_DIR=".build/lint/reports"
 mkdir -p "${OUTPUT_DIR}"
 
 swiftlint --fix --strict --quiet --reporter html --output "${OUTPUT_DIR}/swiftlint.html"
