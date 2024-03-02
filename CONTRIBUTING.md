@@ -4,7 +4,7 @@ If this is your first time contributing to Cloak Swift, please have a read throu
 
 ## Reporting a bug
 
-* Compare the version you have installed with `tuist cloak version` and check it against [the latest version](https://github.com/lordcodes/cloak-swift/releases).
+* Compare the version you have installed with `cloakswift version` and check it against [the latest version](https://github.com/lordcodes/cloak-swift/releases).
 * Check the issue hasn't [already been reported](https://github.com/lordcodes/cloak-swift/issues).
 * Check there isn't already an [open pull request](https://github.com/lordcodes/cloak-swift/pulls) to fix the issue.
 * [Open an issue](https://github.com/lordcodes/cloak-swift/issues/new/choose) providing as much information as possible.
@@ -21,9 +21,11 @@ If this is your first time contributing to Cloak Swift, please have a read throu
 
 * Ensure you have the latest version of Swift installed, the easiest way is via Xcode.
 * Clone the repository.
-* To build: build in Xcode or run `tuist plugin build`.
-* To test: test in Xcode or run `tuist plugin test`.
-* To format code: `tuist swiftformat`.
-* To run locally, navigate to the project you want to run on and then run `tuist plugin run tuist-cloak {COMMAND} --path /path/to/cloak-swift`.
+* Ensure you have required CLI tools: `mise install`.
+* To build: build in Xcode or run `swift build`.
+* To test: test in Xcode or run `swift test`.
+* To format code: `mise r format`.
+* To lint code: `mise r lint`.
+* To run locally, navigate to the project you want to run on and then run `/path/to/cloakswift {COMMAND}`.
 
 Thanks!
