@@ -61,6 +61,14 @@ This will install cloakswift into `/usr/local/bin`. If you get a permission erro
 
 You can uninstall it again using `make uninstall` which simply deletes it from `/usr/local/bin`.
 
+### ▶︎ 🍀 Mint
+
+You can install Cloak Swift on MacOS using [Mint](https://github.com/yonaskolb/Mint) as follows:
+
+```terminal
+mint install lordcodes/cloak-swift
+```
+
 ### ▶︎ 🍺 Homebrew
 
 Support for Homebrew may be planned in the future.
