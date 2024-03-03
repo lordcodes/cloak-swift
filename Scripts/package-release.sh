@@ -41,3 +41,11 @@ zip -r -X $ARTIFACT_BUNDLE_FILENAME $ARTIFACT_BUNDLE
 # Clean-up
 rm -rf $BINARY_DIR
 rm -rf $ARTIFACT_BUNDLE
+
+if [ -z "${GITHUB_ACTIONS}" ]; then
+    echo "Binary created: $FILENAME"
+    echo "SPM artifact bundle created: $ARTIFACT_BUNDLE_FILENAME"
+else
+    echo "FILENAME=${FILENAME}" >> $GITHUB_OUTPUT
+    echo "ARTIFACT_BUNDLE_FILENAME=${ARTIFACT_BUNDLE_FILENAME}" >> $GITHUB_OUTPUT
+fi
