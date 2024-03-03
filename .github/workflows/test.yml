@@ -36,7 +36,7 @@ jobs:
         experimental: true
     
     - name: Lint
-      run: mise r format
+      run: mise r lint
 
     - uses: actions/upload-artifact@v3
       with:
