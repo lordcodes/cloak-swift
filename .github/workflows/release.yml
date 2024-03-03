@@ -75,28 +75,35 @@ jobs:
       with:
         ref: ${{ needs.prepare-release.outputs.commit_hash }}
 
-    - name: Install Tuist
+    - name: Build and package release
+      id: build
       if: ${{ github.event.inputs.publish == 'true' }}
       run: |
-        bash <(curl -Ls https://install.tuist.io)
-
-    - name: Tuist archive
-      if: ${{ github.event.inputs.publish == 'true' }}
-      run: |
-        tuist plugin archive
+        ./Scripts/package-release.sh
         
     - name: Create GitHub Release
       if: ${{ github.event.inputs.publish == 'true' }}
       uses: softprops/action-gh-release@v1
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
-        files: cloak.tuist-plugin.zip
+        files: |
+            "~/${{ steps.build.outputs.FILENAME }}"
+            "~/${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
         name: ${{ needs.prepare-release.outputs.version }}
         tag_name: v${{ needs.prepare-release.outputs.version }}
         body: ${{ needs.prepare-release.outputs.changelog }}
         target_commitish: ${{ needs.prepare-release.outputs.commit_hash }}
 
-    - uses: actions/upload-artifact@v3
+    - name: Upload binary
+      uses: actions/upload-artifact@v3
       with:
-        name: cloak.tuist-plugin.zip
-        path: cloak.tuist-plugin.zip
+        name: ${{ steps.build.outputs.FILENAME }}
+        path: "~/${{ steps.build.outputs.FILENAME }}"
+        retention-days: 5
+
+    - name: Upload SPM artifact bundle
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}
+        path: "~/${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
+        retention-days: 5

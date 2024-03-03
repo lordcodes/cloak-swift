@@ -31,23 +31,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install Tuist
-      run: |
-        bash <(curl -Ls https://install.tuist.io)
+    - uses: jdx/mise-action@v2
+      with:
+        experimental: true
     
-    - name: Tuist fetch
-      run: |
-        tuist fetch
-    
-    - name: SwiftFormat
-      run: |
-        mkdir -p .build/reports
-        tuist swiftformat lint --report .build/reports/swiftformat.json
-    
-    - name: SwiftLint
-      run: |
-        mkdir -p .build/reports
-        tuist swiftlint --reporter html > .build/reports/swiftlint.html
+    - name: Lint
+      run: mise r lint
 
     - uses: actions/upload-artifact@v3
       with:
