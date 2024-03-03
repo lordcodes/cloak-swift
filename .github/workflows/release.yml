@@ -61,7 +61,7 @@ jobs:
 
     - name: Commit
       id: auto_commit
-      uses: stefanzweifel/git-auto-commit-action@v4
+      uses: stefanzweifel/git-auto-commit-action@v5
       if: ${{ github.event.inputs.publish == 'true' }}
       with:
         commit_message: "[Release] Cloak ${{ steps.semvers.outputs.version }}"
@@ -87,8 +87,8 @@ jobs:
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
         files: |
-            "~/${{ steps.build.outputs.FILENAME }}"
-            "~/${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
+            "${{ steps.build.outputs.FILENAME }}"
+            "${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
         name: ${{ needs.prepare-release.outputs.version }}
         tag_name: v${{ needs.prepare-release.outputs.version }}
         body: ${{ needs.prepare-release.outputs.changelog }}
@@ -98,12 +98,12 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.build.outputs.FILENAME }}
-        path: "~/${{ steps.build.outputs.FILENAME }}"
+        path: "${{ steps.build.outputs.FILENAME }}"
         retention-days: 5
 
     - name: Upload SPM artifact bundle
       uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}
-        path: "~/${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
+        path: "${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
         retention-days: 5
