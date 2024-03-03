@@ -87,8 +87,8 @@ jobs:
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
         files: |
-            "${{ steps.build.outputs.FILENAME }}"
-            "${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}"
+            ${{ steps.build.outputs.FILENAME }}
+            ${{ steps.build.outputs.ARTIFACT_BUNDLE_FILENAME }}
         name: ${{ needs.prepare-release.outputs.version }}
         tag_name: v${{ needs.prepare-release.outputs.version }}
         body: ${{ needs.prepare-release.outputs.changelog }}
