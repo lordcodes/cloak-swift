@@ -20,7 +20,7 @@ jobs:
       changelog: ${{ steps.changelog.outputs.changelog }}
       commit_hash: ${{ steps.auto_commit.outputs.commit_hash }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: ${{ github.head_ref }}
         fetch-depth: 0
@@ -37,7 +37,7 @@ jobs:
         version: ${{ steps.previous_tag.outputs.tag }}
 
     - name: Set version
-      run: echo '::set-output name=version::${{ steps.calculated_semvers.outputs.minor }}${{ github.event.inputs.version }}'
+      run: echo "version=${{ steps.calculated_semvers.outputs.minor }}" >> $GITHUB_OUTPUT
       id: semvers
 
     - name: Update Cloak version
@@ -46,7 +46,7 @@ jobs:
 
     - name: Build changelog
       id: changelog
-      uses: mikepenz/release-changelog-builder-action@v3
+      uses: mikepenz/release-changelog-builder-action@v4
       with:
         configuration: ".github/changelog-configuration.json"
         toTag: "main"
@@ -70,7 +70,7 @@ jobs:
     runs-on: macos-latest
     needs: prepare-release
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       if: ${{ github.event.inputs.publish == 'true' }}
       with:
         ref: ${{ needs.prepare-release.outputs.commit_hash }}
