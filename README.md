@@ -47,6 +47,21 @@ The generated Swift uses obfuscation of the values rather than as raw strings.
 
 ## Install
 
+### ▶︎ ⚙️ Mise
+
+Cloak Swift can be installed using Mise or ASDF either globally or with a project-specific version. 
+
+Note: Currently, the plugin URL needs to be specified. The plugin will be added to the registry soon so that this is no longer required.
+
+**Mise `.mise.toml`**
+```toml
+[tools]
+cloak-swift = "0.4.0"
+
+[plugins]
+cloak-swift = "https://github.com/lordcodes/asdf-cloak-swift"
+```
+
 ### ▶︎ 🖥 Standalone via Swift Package Manager
 
 Cloak Swift can be easily installed globally using Swift Package Manager.
@@ -69,16 +84,12 @@ You can install Cloak Swift on MacOS using [Mint](https://github.com/yonaskolb/M
 mint install lordcodes/cloak-swift
 ```
 
-### ▶︎ 🍺 Homebrew
-
-Support for Homebrew may be planned in the future.
-
 ### ▶︎ 📦 As a Swift package
 
 To install Cloak Swift for use in your own Swift code, add it is a Swift Package Manager dependency within your `Package.swift` file. For help in doing this, please check out the Swift Package Manager documentation.
 
 ```swift
-.package(url: "https://github.com/lordcodes/cloak-swift", exact: "VERSION")
+.package(url: "https://github.com/lordcodes/cloak-swift", exact: "0.4.0")
 ```
 
 &nbsp;
