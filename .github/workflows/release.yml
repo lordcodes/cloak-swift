@@ -43,6 +43,8 @@ jobs:
     - name: Update Cloak version
       run: |
         sed -i -e "s/current = \".*\"/current = \"${{ steps.semvers.outputs.version }}\"/g" Sources/CloakKit/Version/Version.swift
+        sed -i '' "s/cloak-swift = \".*\"/cloak-swift = "${{ steps.semvers.outputs.version }}"/g" README.md
+        sed -i '' "s/.package(url: \"https:\/\/github\.com\/lordcodes\/cloak-swift\", exact: \".*\")/.package(url: \"https:\/\/github\.com\/lordcodes\/cloak-swift\", exact: \"${{ steps.semvers.outputs.version }}\")/g" README.md
 
     - name: Build changelog
       id: changelog
